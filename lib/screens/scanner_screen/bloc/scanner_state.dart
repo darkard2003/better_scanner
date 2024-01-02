@@ -34,7 +34,7 @@ class ScannerScreenState extends ScannerState with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [isLoading, msg, ...qrCodes];
+  List<Object?> get props => [isLoading, msg];
 
   @override
   ScannerScreenState copyWith({

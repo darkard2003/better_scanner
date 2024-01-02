@@ -6,7 +6,12 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 class ScanWindow extends StatelessWidget {
   final Function(QrRecordModel record) onDetect;
   final MobileScannerController? controller;
-  const ScanWindow({super.key, required this.onDetect, this.controller});
+  final double dimension;
+  const ScanWindow(
+      {super.key,
+      required this.onDetect,
+      this.controller,
+      this.dimension = 300});
 
   void translate(BarcodeCapture capture, BuildContext context) {
     var codes = capture.barcodes;
@@ -29,9 +34,11 @@ class ScanWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
+      dimension: dimension,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: MobileScanner(onDetect: (capture) {}),
+        child:
+            MobileScanner(onDetect: (capture) => translate(capture, context),),
       ),
     );
   }

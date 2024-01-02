@@ -10,3 +10,13 @@ class ScannerEventScan extends ScannerEvent {
   final QrRecordModel code;
   const ScannerEventScan(this.code);
 }
+
+class ScannerEventDelete extends ScannerEvent {
+  final QrRecordModel code;
+  const ScannerEventDelete(this.code);
+}
+
+class ScannerEventUpdate extends ScannerEvent {
+  final QrRecordModel code;
+  const ScannerEventUpdate(this.code);
+}

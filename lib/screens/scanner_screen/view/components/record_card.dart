@@ -1,4 +1,5 @@
 import 'package:better_scanner/models/qr_record_model.dart';
+import 'package:better_scanner/models/qr_type.dart';
 import 'package:flutter/material.dart';
 
 class RecordCard extends StatelessWidget {
@@ -17,9 +18,10 @@ class RecordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        leading: Icon(record.type.icon),
         onTap: () => onTap(record),
         onLongPress: onLongPress == null ? null : () => onLongPress!(record),
-        title: record.name.isEmpty ? null : Text(record.name),
+        title: Text(record.name.isEmpty ? 'No name' : record.name),
         subtitle: Text(record.data),
         trailing: onOptions == null
             ? null
@@ -29,5 +31,22 @@ class RecordCard extends StatelessWidget {
               ),
       ),
     );
+  }
+}
+
+extension on QrType {
+  IconData get icon {
+    switch (this) {
+      case QrType.url:
+        return Icons.link;
+      case QrType.text:
+        return Icons.text_fields;
+      case QrType.wifi:
+        return Icons.wifi;
+      case QrType.unknown:
+        return Icons.text_fields;
+      default:
+        return Icons.text_fields;
+    }
   }
 }
