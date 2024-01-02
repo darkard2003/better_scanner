@@ -18,9 +18,8 @@ class ScannerView extends StatelessWidget {
       body: Flex(
         direction: Axis.vertical,
         children: [
-          const SizedBox(height: 16),
-          Flexible(
-            flex: 1,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
             child: ScanWindow(
               onDetect: (record) {
                 BlocProvider.of<ScannerBloc>(context)
@@ -28,21 +27,30 @@ class ScannerView extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 16),
           Flexible(
               flex: 2,
-              child: CustomScrollView(slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Scanned codes: ${state.qrCodes.length}',
-                      style: Theme.of(context).textTheme.headlineLarge,
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16),
                   ),
                 ),
-                RecordListViewSliver(records: state.qrCodes, onTap: (_) {}),
-              ])),
+                child: CustomScrollView(slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'History',
+                        style: Theme.of(context).textTheme.headlineLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  RecordListViewSliver(records: state.qrCodes, onTap: (_) {}),
+                ]),
+              )),
         ],
       ),
     );

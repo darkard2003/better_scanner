@@ -16,8 +16,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Better Scanner',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan),
         useMaterial3: true,
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.cyan, brightness: Brightness.dark),
       ),
       home: BlocProvider<ScannerBloc>(
           create: (context) => ScannerBloc(), child: const ScannerScreen()),

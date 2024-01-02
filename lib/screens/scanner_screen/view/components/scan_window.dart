@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:flutter/material.dart';
@@ -30,11 +28,7 @@ class ScanWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    var dim = min(width, height) * 0.8;
     return SizedBox.square(
-      dimension: dim,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: MobileScanner(onDetect: (capture) {}),
