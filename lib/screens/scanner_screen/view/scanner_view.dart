@@ -1,5 +1,7 @@
+import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
+import 'package:better_scanner/screens/scanner_screen/view/components/rename_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -9,6 +11,40 @@ import 'components/scan_window.dart';
 class ScannerView extends StatelessWidget {
   final ScannerScreenState state;
   const ScannerView({super.key, required this.state});
+
+  void _onTap(QrRecordModel record, BuildContext context) async {
+    BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnTap(record));
+  }
+
+  void _onLongPress(QrRecordModel record, BuildContext context) async {
+    BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnLongPress(record));
+  }
+
+  void _onRename(QrRecordModel record, BuildContext context) async {
+    var name = await showRenameDialog(context, record.name);
+    if (name == null) return;
+    if (!context.mounted) return;
+    BlocProvider.of<ScannerBloc>(context).add(ScannerEventRename(record, name));
+  }
+
+  void _onDelete(QrRecordModel record, BuildContext context) async {
+    BlocProvider.of<ScannerBloc>(context).add(ScannerEventDelete(record));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Deleted ${record.data}'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
+          },
+        ),
+      ),
+    );
+  }
+
+  void _onShare(QrRecordModel record, BuildContext context) async {
+    BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnShare(record));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +60,7 @@ class ScannerView extends StatelessWidget {
         );
       });
     }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Better Scanner'),
@@ -62,7 +99,21 @@ class ScannerView extends StatelessWidget {
               ),
               RecordListViewSliver(
                 records: state.qrCodes,
-                onTap: (record) {},
+                onTap: (record) {
+                  _onTap(record, context);
+                },
+                onLongPress: (record) {
+                  _onLongPress(record, context);
+                },
+                onDelete: (record) {
+                  _onDelete(record, context);
+                },
+                onRename: (record) {
+                  _onRename(record, context);
+                },
+                onShare: (record) {
+                  _onShare(record, context);
+                },
               ),
             ]),
           )),

@@ -5,15 +5,19 @@ import 'package:flutter/material.dart';
 class RecordListViewSliver extends StatelessWidget {
   final List<QrRecordModel> records;
   final Function(QrRecordModel record) onTap;
-  final Function(QrRecordModel record)? onLongPress;
-  final Function(QrRecordModel record)? onOptions;
+  final Function(QrRecordModel record) onLongPress;
+  final Function(QrRecordModel record) onRename;
+  final Function(QrRecordModel record) onDelete;
+  final Function(QrRecordModel record) onShare;
 
   const RecordListViewSliver({
     super.key,
     required this.records,
     required this.onTap,
-    this.onLongPress,
-    this.onOptions,
+    required this.onLongPress,
+    required this.onRename,
+    required this.onDelete,
+    required this.onShare, 
   });
 
   @override
@@ -23,7 +27,9 @@ class RecordListViewSliver extends StatelessWidget {
         record: records[i],
         onTap: onTap,
         onLongPress: onLongPress,
-        onOptions: onOptions,
+        onDelete: onDelete,
+        onRename: onRename,
+        onShare: onShare,
       ),
       itemCount: records.length,
     );
