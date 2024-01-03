@@ -12,13 +12,13 @@ class ScannerEventScan extends ScannerEvent {
 }
 
 class ScannerEventDelete extends ScannerEvent {
-  final QrRecordModel code;
-  const ScannerEventDelete(this.code);
+  final QrRecordModel record;
+  const ScannerEventDelete(this.record);
 }
 
 class ScannerEventUpdate extends ScannerEvent {
-  final QrRecordModel code;
-  const ScannerEventUpdate(this.code);
+  final QrRecordModel record;
+  const ScannerEventUpdate(this.record);
 }
 
 class ScannerEventOnTap extends ScannerEvent {
@@ -27,8 +27,8 @@ class ScannerEventOnTap extends ScannerEvent {
 }
 
 class ScannerEventOnLongPress extends ScannerEvent {
-  final QrRecordModel code;
-  const ScannerEventOnLongPress(this.code);
+  final QrRecordModel record;
+  const ScannerEventOnLongPress(this.record);
 }
 
 class ScannerEventRename extends ScannerEvent {

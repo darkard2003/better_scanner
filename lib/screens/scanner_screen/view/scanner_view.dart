@@ -2,6 +2,7 @@ import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/rename_dialog.dart';
+import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -18,6 +19,7 @@ class ScannerView extends StatelessWidget {
 
   void _onLongPress(QrRecordModel record, BuildContext context) async {
     BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnLongPress(record));
+    showSnackbar(context, 'Copied to clipboard');
   }
 
   void _onRename(QrRecordModel record, BuildContext context) async {

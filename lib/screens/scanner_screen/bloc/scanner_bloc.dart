@@ -13,6 +13,7 @@ export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   late Database db;
   var records = <QrRecordModel>[];
+
   ScannerBloc() : super(ScannerStateUninitialized()) {
     on<ScannerEventInit>(_onInit);
     on<ScannerEventScan>(_onScan);
@@ -52,7 +53,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   }
 
   void _onDelete(ScannerEventDelete event, Emitter<ScannerState> emit) async {
-    await db.deleteRecord(event.code);
+    await db.deleteRecord(event.record);
     records = await db.getRecords();
     emit(ScannerScreenState(
       qrCodes: records,
@@ -67,13 +68,19 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       record.copy();
       emit(ScannerScreenState(
         qrCodes: records,
-        msg: 'Copied to clipboard',
+        msg: 'Cannot open ${record.data}, copied to clipboard',
       ));
     }
   }
 
-  void _onLongPress(
-      ScannerEventOnLongPress event, Emitter<ScannerState> emit) {}
+  void _onLongPress(ScannerEventOnLongPress event, Emitter<ScannerState> emit) {
+    var record = event.record;
+    record.copy();
+    emit(ScannerScreenState(
+      qrCodes: records,
+      msg: 'Copied to clipboard',
+    ));
+  }
 
   void _onShare(ScannerEventOnShare event, Emitter<ScannerState> emit) {
     var record = event.record;
