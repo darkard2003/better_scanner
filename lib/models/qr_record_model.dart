@@ -17,7 +17,7 @@ class QrRecordModel {
   });
 
   QrRecordModel.newEmpty({required this.data, required this.type})
-      : id = data,
+      : id = data.hashCode.toString(),
         name = '',
         createdAt = DateTime.now();
 

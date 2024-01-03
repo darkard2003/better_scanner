@@ -3,8 +3,8 @@ import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
+import 'package:better_scanner/services/qr_model_open.dart';
 import 'package:bloc/bloc.dart';
-import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
@@ -59,13 +59,17 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     ));
   }
 
-  void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) {
+  void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
     var record = event.record;
-    Clipboard.setData(ClipboardData(text: record.data));
-    emit(ScannerScreenState(
-      qrCodes: records,
-      msg: 'Copied ${record.data}',
-    ));
+    if (await record.canOpen()) {
+      await record.open();
+    } else {
+      record.copy();
+      emit(ScannerScreenState(
+        qrCodes: records,
+        msg: 'Copied to clipboard',
+      ));
+    }
   }
 
   void _onLongPress(

@@ -1,5 +1,6 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/services/qr_extraction_service.dart';
 import 'package:flutter/material.dart';
 
 enum RecordAction { rename, delete, share }
@@ -59,8 +60,8 @@ class RecordCard extends StatelessWidget {
           leading: Icon(record.type.icon),
           onTap: () => onTap(record),
           onLongPress: () => onLongPress(record),
-          title: Text(record.name.isEmpty ? 'No name' : record.name),
-          subtitle: Text(record.data),
+          title: Text(record.name.isEmpty ? record.displayName : record.name),
+          subtitle: Text(record.displayData),
           trailing: PopupMenuButton<RecordAction>(
             onSelected: (action) {
               switch (action) {
