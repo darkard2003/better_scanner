@@ -4,6 +4,12 @@ enum QrType {
   url,
   wifi,
   geo,
+  phone,
+  sms,
+  email,
+  contact,
+  calendar,
+  event,
 }
 
 extension QrExtention on QrType {
@@ -19,6 +25,18 @@ extension QrExtention on QrType {
         return 'WiFi';
       case QrType.geo:
         return 'Geo';
+      case QrType.phone:
+        return 'Telephone';
+      case QrType.sms:
+        return 'SMS';
+      case QrType.email:
+        return 'Email';
+      case QrType.contact:
+        return 'Contact';
+      case QrType.calendar:
+        return 'Calendar';
+      case QrType.event:
+        return 'Event';
     }
   }
 }

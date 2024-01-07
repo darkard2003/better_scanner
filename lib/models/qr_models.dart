@@ -29,7 +29,6 @@ class WifiCred extends QrRecordModel {
 
   @override
   String get copyData => password;
-
 }
 
 class GeoLocation extends QrRecordModel {
@@ -102,4 +101,211 @@ class Url extends QrRecordModel {
     }
     return host;
   }
+}
+
+class Phone extends QrRecordModel {
+  late String number;
+
+  Phone({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    number = data.split(':')[1];
+  }
+
+  @override
+  String get displayName => name.isEmpty ? 'Phone' : name;
+
+  @override
+  String get displayData => number;
+
+  @override
+  String get copyData => number;
+}
+
+class Sms extends QrRecordModel {
+  late String number;
+  late String message;
+
+  Sms({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    var parts = data.split(':');
+    number = parts[1];
+    message = parts[2];
+  }
+
+  @override
+  String get displayName => name.isEmpty ? 'SMS' : name;
+
+  @override
+  String get displayData => '$number:$message';
+
+  @override
+  String get copyData => '$number\n$message';
+}
+
+class Email extends QrRecordModel {
+  late String address;
+  late String subject;
+  late String body;
+
+  Email({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    var parts = data.replaceAll('MATMSG:', '').split(';');
+    address = parts[0].split(':')[1];
+    subject = parts[1].split(':')[1];
+    body = parts[2].split(':')[1];
+  }
+
+  @override
+  String get displayName => name.isEmpty ? 'Email' : name;
+
+  @override
+  String get displayData => '$address:$subject:$body';
+
+  @override
+  String get copyData => '$address\n$subject\n$body';
+}
+
+class Contact extends QrRecordModel {
+  final Map<String, String> _fields = {
+    'FN': 'Name',
+    'ORG': 'Organization',
+    'TITLE': 'Title',
+    'TEL': 'Phone',
+    'EMAIL': 'Email',
+    'URL': 'Website',
+    'ADR': 'Address',
+    'NOTE': 'Note',
+  };
+
+  Contact({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    var lines = data.split('\n');
+    for (var line in lines) {
+      var parts = line.split(':');
+      var key = parts[0].split(';')[0];
+      var value = parts[1];
+      if (_fields.containsKey(key)) {
+        _fields[key] = value;
+      }
+    }
+  }
+
+  String get cname => _fields['FN'] ?? 'No Name';
+  String get phone => _fields['TEL'] ?? 'No Phone';
+  String get email => _fields['EMAIL'] ?? 'No Email';
+
+  @override
+  String get displayName => name.isEmpty ? cname : name;
+
+  @override
+  String get displayData => '$cname:$phone:$email';
+
+  @override
+  String get copyData => '$cname\n$phone\n$email';
+}
+
+class Calendar extends QrRecordModel {
+  final Map<String, String> _fields = {
+    'SUMMARY': 'Event',
+    'LOCATION': 'Location',
+    'DESCRIPTION': 'Description',
+    'DTSTART': 'Start',
+    'DTEND': 'End',
+  };
+
+  Calendar({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    var lines = data.split('\n');
+    for (var line in lines) {
+      var parts = line.split(':');
+      var key = parts[0];
+      var value = parts[1];
+      if (_fields.containsKey(key)) {
+        _fields[key] = value;
+      }
+    }
+  }
+
+  String get event => _fields['SUMMARY'] ?? 'No Event';
+  String get location => _fields['LOCATION'] ?? 'No Location';
+  String get description => _fields['DESCRIPTION'] ?? 'No Description';
+  DateTime get start => DateTime.parse(_fields['DTSTART'] ?? 'No Start');
+  DateTime get end => DateTime.parse(_fields['DTEND'] ?? 'No End');
+
+  @override
+  String get displayName => name.isEmpty ? event : name;
+
+  @override
+  String get displayData => '$event:$location:$description:$start:$end';
+
+  @override
+  String get copyData => '$event\n$location\n$description\n$start\n$end';
+}
+
+class Event extends QrRecordModel {
+  final Map<String, String> _fields = {
+    'SUMMARY': 'Event',
+    'LOCATION': 'Location',
+    'DESCRIPTION': 'Description',
+    'DTSTART': 'Start',
+    'DTEND': 'End',
+  };
+
+  Event({
+    required super.id,
+    required super.name,
+    required super.data,
+    required super.type,
+    required super.createdAt,
+  }) {
+    var lines = data.split('\n');
+    for (var line in lines) {
+      var parts = line.split(':');
+      var key = parts[0];
+      var value = parts[1];
+      if (_fields.containsKey(key)) {
+        _fields[key] = value;
+      }
+    }
+  }
+
+  String get event => _fields['SUMMARY'] ?? 'No Event';
+  String get location => _fields['LOCATION'] ?? 'No Location';
+  String get description => _fields['DESCRIPTION'] ?? 'No Description';
+  DateTime get start => DateTime.parse(_fields['DTSTART'] ?? 'No Start');
+  DateTime get end => DateTime.parse(_fields['DTEND'] ?? 'No End');
+
+  @override
+  String get displayName => name.isEmpty ? event : name;
+
+  @override
+  String get displayData => '$event:$location:$description:$start:$end';
+
+  @override
+  String get copyData => '$event\n$location\n$description\n$start\n$end';
 }

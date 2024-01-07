@@ -111,6 +111,20 @@ extension on QrType {
         return Icons.text_fields;
       case QrType.geo:
         return Icons.location_on;
+      case QrType.phone:
+        return Icons.phone;
+      case QrType.sms:
+        return Icons.sms;
+      case QrType.email:
+        return Icons.email;
+      case QrType.contact:
+        return Icons.contact_page;
+      case QrType.calendar:
+        return Icons.calendar_today;
+      case QrType.event:
+        return Icons.event;
+      default:
+        return Icons.text_fields;
     }
   }
 }

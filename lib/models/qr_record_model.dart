@@ -24,14 +24,18 @@ class QrRecordModel {
   String get copyData => data;
   bool get canOpen => false;
 
-  factory QrRecordModel.newEmpty({required data, type}) {
-    var id = const Uuid().v4().toString();
-    var createdAt = DateTime.now();
+  factory QrRecordModel.newType({
+    required id,
+    required name,
+    required data,
+    required type,
+    required createdAt,
+  }) {
     switch (type) {
       case QrType.url:
         return Url(
           id: id,
-          name: '',
+          name: name,
           data: data,
           type: type,
           createdAt: createdAt,
@@ -39,7 +43,7 @@ class QrRecordModel {
       case QrType.wifi:
         return WifiCred(
           id: id,
-          name: '',
+          name: name,
           data: data,
           type: type,
           createdAt: createdAt,
@@ -47,7 +51,58 @@ class QrRecordModel {
       case QrType.geo:
         return GeoLocation(
           id: id,
-          name: '',
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.phone:
+        return Phone(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+
+      case QrType.sms:
+        return Sms(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+
+      case QrType.email:
+        return Email(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.contact:
+        return Contact(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+
+      case QrType.calendar:
+        return Calendar(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.event:
+        return Event(
+          id: id,
+          name: name,
           data: data,
           type: type,
           createdAt: createdAt,
@@ -55,12 +110,25 @@ class QrRecordModel {
       default:
         return QrRecordModel(
           id: id,
-          name: '',
+          name: name,
           data: data,
           type: type,
           createdAt: createdAt,
         );
     }
+  }
+
+  factory QrRecordModel.newEmpty({required data, type}) {
+    var id = const Uuid().v4().toString();
+    var createdAt = DateTime.now();
+
+    return QrRecordModel.newType(
+      id: id,
+      name: '',
+      data: data,
+      type: type,
+      createdAt: createdAt,
+    );
   }
 
   factory QrRecordModel.fromMap(Map<dynamic, dynamic> map) {
@@ -70,40 +138,13 @@ class QrRecordModel {
     var type = QrType.values[map[consts.type]];
     var createdAt = DateTime.parse(map[consts.createdAt]);
 
-    switch (type) {
-      case QrType.url:
-        return Url(
-          id: id,
-          name: name,
-          data: data,
-          type: type,
-          createdAt: createdAt,
-        );
-      case QrType.wifi:
-        return WifiCred(
-          id: id,
-          name: name,
-          data: data,
-          type: type,
-          createdAt: createdAt,
-        );
-      case QrType.geo:
-        return GeoLocation(
-          id: id,
-          name: name,
-          data: data,
-          type: type,
-          createdAt: createdAt,
-        );
-      default:
-        return QrRecordModel(
-          id: id,
-          name: name,
-          data: data,
-          type: type,
-          createdAt: createdAt,
-        );
-    }
+    return QrRecordModel.newType(
+      id: id,
+      name: name,
+      data: data,
+      type: type,
+      createdAt: createdAt,
+    );
   }
 
   QrRecordModel copyWith({
