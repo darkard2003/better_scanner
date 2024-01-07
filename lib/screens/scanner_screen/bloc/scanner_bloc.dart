@@ -3,8 +3,8 @@ import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
-import 'package:better_scanner/services/qr_model_open.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
@@ -38,7 +38,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     await db.addRecord(event.record);
     records = await db.getRecords();
     emit(ScannerScreenState(
-        qrCodes: records, msg: 'Added ${event.record.data}'));
+        qrCodes: records, msg: 'Added ${event.record.displayName}'));
   }
 
   void _onRename(ScannerEventRename event, Emitter<ScannerState> emit) async {
@@ -48,7 +48,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     records = await db.getRecords();
     emit(ScannerScreenState(
       qrCodes: records,
-      msg: 'Renamed ${event.record.data} to ${event.name}',
+      msg: 'Renamed ${event.record.displayName} to ${event.name}',
     ));
   }
 
@@ -62,20 +62,20 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
   void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
     var record = event.record;
-    if (await record.canOpen()) {
-      await record.open();
+    if (record.canOpen) {
+      // TODO: implement open
     } else {
-      record.copy();
+      Clipboard.setData(ClipboardData(text: record.copyData));
       emit(ScannerScreenState(
         qrCodes: records,
-        msg: 'Cannot open ${record.data}, copied to clipboard',
+        msg: 'Cannot open ${record.displayName}, copied to clipboard',
       ));
     }
   }
 
   void _onLongPress(ScannerEventOnLongPress event, Emitter<ScannerState> emit) {
     var record = event.record;
-    record.copy();
+    Clipboard.setData(ClipboardData(text: record.copyData));
     emit(ScannerScreenState(
       qrCodes: records,
       msg: 'Copied to clipboard',

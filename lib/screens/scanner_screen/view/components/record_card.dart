@@ -1,6 +1,5 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
-import 'package:better_scanner/services/qr_extraction_service.dart';
 import 'package:flutter/material.dart';
 
 enum RecordAction { rename, delete, share }
@@ -110,8 +109,8 @@ extension on QrType {
         return Icons.wifi;
       case QrType.unknown:
         return Icons.text_fields;
-      default:
-        return Icons.text_fields;
+      case QrType.geo:
+        return Icons.location_on;
     }
   }
 }

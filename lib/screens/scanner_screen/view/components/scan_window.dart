@@ -37,8 +37,17 @@ class ScanWindow extends StatelessWidget {
       dimension: dimension,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child:
-            MobileScanner(onDetect: (capture) => translate(capture, context),),
+        child: MobileScanner(
+          onDetect: (capture) => translate(capture, context),
+          placeholderBuilder: (context, widget) =>
+              widget ??
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+        ),
       ),
     );
   }

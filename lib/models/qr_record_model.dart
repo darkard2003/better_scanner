@@ -1,3 +1,6 @@
+import 'package:better_scanner/models/qr_models.dart';
+import 'package:uuid/uuid.dart';
+
 import 'qr_type.dart';
 import 'model_consts.dart' as consts;
 
@@ -16,17 +19,92 @@ class QrRecordModel {
     required this.createdAt,
   });
 
-  QrRecordModel.newEmpty({required this.data, required this.type})
-      : id = data.hashCode.toString(),
-        name = '',
-        createdAt = DateTime.now();
+  String get displayName => name.isEmpty ? 'No Name' : name;
+  String get displayData => data;
+  String get copyData => data;
+  bool get canOpen => false;
 
-  QrRecordModel.fromMap(Map<dynamic, dynamic> map)
-      : id = map[consts.id],
-        name = map[consts.name],
-        data = map[consts.data],
-        type = QrType.values[map[consts.type]],
-        createdAt = DateTime.parse(map[consts.createdAt]);
+  factory QrRecordModel.newEmpty({required data, type}) {
+    var id = const Uuid().v4().toString();
+    var createdAt = DateTime.now();
+    switch (type) {
+      case QrType.url:
+        return Url(
+          id: id,
+          name: '',
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.wifi:
+        return WifiCred(
+          id: id,
+          name: '',
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.geo:
+        return GeoLocation(
+          id: id,
+          name: '',
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      default:
+        return QrRecordModel(
+          id: id,
+          name: '',
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+    }
+  }
+
+  factory QrRecordModel.fromMap(Map<dynamic, dynamic> map) {
+    var id = map[consts.id];
+    var name = map[consts.name];
+    var data = map[consts.data];
+    var type = QrType.values[map[consts.type]];
+    var createdAt = DateTime.parse(map[consts.createdAt]);
+
+    switch (type) {
+      case QrType.url:
+        return Url(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.wifi:
+        return WifiCred(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      case QrType.geo:
+        return GeoLocation(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+      default:
+        return QrRecordModel(
+          id: id,
+          name: name,
+          data: data,
+          type: type,
+          createdAt: createdAt,
+        );
+    }
+  }
 
   QrRecordModel copyWith({
     String? id,

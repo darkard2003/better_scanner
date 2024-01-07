@@ -3,6 +3,7 @@ enum QrType {
   text,
   url,
   wifi,
+  geo,
 }
 
 extension QrExtention on QrType {
@@ -16,6 +17,8 @@ extension QrExtention on QrType {
         return 'URL';
       case QrType.wifi:
         return 'WiFi';
+      case QrType.geo:
+        return 'Geo';
     }
   }
 }
