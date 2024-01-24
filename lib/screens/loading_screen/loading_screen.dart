@@ -5,12 +5,20 @@ class LoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
         child: Center(
           child: Column(
             children: [
-              LinearProgressIndicator(),
+              const LinearProgressIndicator(),
+              Expanded(
+                child: Center(
+                  child: Image.asset(
+                    'assets/images/icon.png',
+                    width: 200,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

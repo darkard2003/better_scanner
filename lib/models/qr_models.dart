@@ -180,7 +180,7 @@ class Email extends QrRecordModel {
   String get copyData => '$address\n$subject\n$body';
 }
 
-class Contact extends QrRecordModel {
+class VCard extends QrRecordModel {
   final Map<String, String> _fields = {
     'FN': 'Name',
     'ORG': 'Organization',
@@ -192,7 +192,7 @@ class Contact extends QrRecordModel {
     'NOTE': 'Note',
   };
 
-  Contact({
+  VCard({
     required super.id,
     required super.name,
     required super.data,

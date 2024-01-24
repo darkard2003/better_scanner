@@ -83,7 +83,7 @@ class QrRecordModel {
           createdAt: createdAt,
         );
       case QrType.contact:
-        return Contact(
+        return VCard(
           id: id,
           name: name,
           data: data,
