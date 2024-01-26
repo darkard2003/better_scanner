@@ -1,9 +1,10 @@
 import 'package:better_scanner/models/qr_record_model.dart';
+import 'package:better_scanner/screens/scanner_screen/bloc/state_message.dart';
 import 'package:equatable/equatable.dart';
 
 class ScannerState {
   bool isLoading;
-  String? msg;
+  StateMessage? msg;
 
   ScannerState({
     required this.isLoading,
@@ -12,7 +13,7 @@ class ScannerState {
 
   ScannerState copyWith({
     bool? isLoading,
-    String? msg,
+    StateMessage? msg,
   }) {
     return ScannerState(
       isLoading: isLoading ?? this.isLoading,
@@ -34,12 +35,12 @@ class ScannerScreenState extends ScannerState with EquatableMixin {
   });
 
   @override
-  List<Object?> get props => [isLoading, msg];
+  List<Object?> get props => [isLoading, msg, qrCodes];
 
   @override
   ScannerScreenState copyWith({
     bool? isLoading,
-    String? msg,
+    StateMessage? msg,
     List<QrRecordModel>? qrCodes,
   }) {
     return ScannerScreenState(

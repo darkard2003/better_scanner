@@ -1,7 +1,6 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
-import 'package:better_scanner/screens/scanner_screen/view/components/rename_dialog.dart';
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,37 +16,6 @@ class ScannerView extends StatelessWidget {
     BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnTap(record));
   }
 
-  void _onLongPress(QrRecordModel record, BuildContext context) async {
-    BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnLongPress(record));
-    showSnackbar(context, 'Copied to clipboard');
-  }
-
-  void _onRename(QrRecordModel record, BuildContext context) async {
-    var name = await showRenameDialog(context, record.name);
-    if (name == null) return;
-    if (!context.mounted) return;
-    BlocProvider.of<ScannerBloc>(context).add(ScannerEventRename(record, name));
-  }
-
-  void _onDelete(QrRecordModel record, BuildContext context) async {
-    BlocProvider.of<ScannerBloc>(context).add(ScannerEventDelete(record));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Deleted ${record.data}'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
-          },
-        ),
-      ),
-    );
-  }
-
-  void _onShare(QrRecordModel record, BuildContext context) async {
-    BlocProvider.of<ScannerBloc>(context).add(ScannerEventOnShare(record));
-  }
-
   @override
   Widget build(BuildContext context) {
     var controller = MobileScannerController(
@@ -55,11 +23,7 @@ class ScannerView extends StatelessWidget {
     );
     if (state.msg != null) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(state.msg!),
-          ),
-        );
+        state.msg?.show(context);
       });
     }
 
@@ -89,32 +53,26 @@ class ScannerView extends StatelessWidget {
               ),
             ),
             child: CustomScrollView(slivers: [
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'History',
-                    style: Theme.of(context).textTheme.headlineLarge,
-                    textAlign: TextAlign.center,
-                  ),
+              const SliverAppBar(
+                title: Text(
+                  'History',
                 ),
+                floating: true,
+                snap: true,
+                leading: Icon(Icons.history),
+                actions: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 16),
+                    child: Icon(Icons.search),
+                  ),
+                ],
+                backgroundColor: Colors.transparent,
+                centerTitle: true,
               ),
               RecordListViewSliver(
                 records: state.qrCodes,
                 onTap: (record) {
                   _onTap(record, context);
-                },
-                onLongPress: (record) {
-                  _onLongPress(record, context);
-                },
-                onDelete: (record) {
-                  _onDelete(record, context);
-                },
-                onRename: (record) {
-                  _onRename(record, context);
-                },
-                onShare: (record) {
-                  _onShare(record, context);
                 },
               ),
             ]),

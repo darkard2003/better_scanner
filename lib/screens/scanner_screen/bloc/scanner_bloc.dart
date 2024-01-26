@@ -1,6 +1,7 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
+import 'package:better_scanner/screens/scanner_screen/bloc/state_message.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:bloc/bloc.dart';
@@ -30,34 +31,56 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       records = await db.getRecords();
       emit(ScannerScreenState(qrCodes: records));
     } catch (e) {
-      emit(ScannerScreenState(qrCodes: [], msg: e.toString()));
+      emit(
+        ScannerScreenState(
+          qrCodes: [],
+          msg: StateMessage(
+            message: e.toString(),
+            type: StateMessageType.error,
+          ),
+        ),
+      );
     }
   }
 
   void _onScan(ScannerEventScan event, Emitter<ScannerState> emit) async {
     await db.addRecord(event.record);
     records = await db.getRecords();
-    emit(ScannerScreenState(
-        qrCodes: records, msg: 'Added ${event.record.displayName}'));
+    emit(
+      ScannerScreenState(
+        qrCodes: records,
+        msg: StateMessage(message: 'Added ${event.record.name}'),
+      ),
+    );
   }
 
   void _onRename(ScannerEventRename event, Emitter<ScannerState> emit) async {
     var record = event.record;
+    var name = record.name;
     record.name = event.name;
     await db.updateRecord(record);
     records = await db.getRecords();
     emit(ScannerScreenState(
       qrCodes: records,
-      msg: 'Renamed ${event.record.displayName} to ${event.name}',
+      msg: StateMessage(message: 'Renamed $name to ${event.name}'),
     ));
   }
 
   void _onDelete(ScannerEventDelete event, Emitter<ScannerState> emit) async {
-    await db.deleteRecord(event.record);
+    var record = event.record;
+    await db.deleteRecord(record);
     records = await db.getRecords();
-    emit(ScannerScreenState(
-      qrCodes: records,
-    ));
+    emit(
+      ScannerScreenState(
+        qrCodes: records,
+        msg: StateMessage(
+          message: "Deleted ${record.name}",
+          action: MessageAction('Undo', () {
+            add(ScannerEventScan(record));
+          }),
+        ),
+      ),
+    );
   }
 
   void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
@@ -68,7 +91,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       Clipboard.setData(ClipboardData(text: record.copyData));
       emit(ScannerScreenState(
         qrCodes: records,
-        msg: 'Cannot open ${record.displayName}, copied to clipboard',
+        msg: StateMessage(message: 'Copied to clipboard'),
       ));
     }
   }
@@ -78,7 +101,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Clipboard.setData(ClipboardData(text: record.copyData));
     emit(ScannerScreenState(
       qrCodes: records,
-      msg: 'Copied to clipboard',
+      msg: StateMessage(message: 'Copied to clipboard'),
     ));
   }
 

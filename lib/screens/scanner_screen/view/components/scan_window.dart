@@ -38,6 +38,7 @@ class ScanWindow extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: MobileScanner(
+          controller: controller,
           onDetect: (capture) => translate(capture, context),
           placeholderBuilder: (context, widget) =>
               widget ??
