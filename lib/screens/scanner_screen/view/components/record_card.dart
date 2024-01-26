@@ -6,17 +6,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-enum RecordAction { rename, delete, share }
+enum RecordAction {
+  rename,
+  share,
+  delete,
+}
 
 extension on RecordAction {
+  Color? get foregroundColor {
+    if (this == RecordAction.delete) {
+      return Colors.red;
+    }
+    return null;
+  }
+
   IconData get icon {
     switch (this) {
       case RecordAction.rename:
-        return Icons.edit;
+        return Icons.edit_outlined;
       case RecordAction.delete:
-        return Icons.delete;
+        return Icons.delete_outlined;
       case RecordAction.share:
-        return Icons.share;
+        return Icons.share_outlined;
       default:
         return Icons.edit;
     }
@@ -32,51 +43,83 @@ class RecordCard extends StatelessWidget {
     required this.onTap,
   });
 
+  void _rename(BuildContext context, QrRecordModel record,
+      ScannerBloc scannerBloc) async {
+    var name = await showRenameDialog(context, record.name);
+    if (name != null) {
+      scannerBloc.add(ScannerEventRename(record, name));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var scannerBloc = BlocProvider.of<ScannerBloc>(context);
-    return Slidable(
-      key: ValueKey(record),
-      startActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          SlidableAction(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(8),
-              bottomLeft: Radius.circular(8),
-            ),
-            onPressed: (context) async {
-              var name = await showRenameDialog(context, record.name);
-              if (name == null) return;
-              scannerBloc.add(ScannerEventRename(record, name));
-            },
-            icon: RecordAction.rename.icon,
-            backgroundColor: Colors.blue,
-          ),
-          SlidableAction(
-            onPressed: (context) =>
-                scannerBloc.add(ScannerEventOnShare(record)),
-            icon: RecordAction.share.icon,
-            backgroundColor: Colors.green,
-          ),
-          SlidableAction(
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(8),
-              bottomRight: Radius.circular(8),
-            ),
-            onPressed: (context) => scannerBloc.add(ScannerEventDelete(record)),
-            icon: RecordAction.delete.icon,
-            backgroundColor: Colors.red,
-          ),
-        ],
-      ),
-      child: Card(
-        child: ListTile(
-          leading: Icon(record.type.icon),
-          onTap: () => onTap(record),
-          title: Text(record.name.isEmpty ? record.displayName : record.name),
-          subtitle: Text(record.displayData),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      elevation: 3,
+      child: Slidable(
+        key: ValueKey(record),
+        startActionPane: ActionPane(
+          motion: const BehindMotion(),
+          children: RecordAction.values
+              .map(
+                (action) => SlidableAction(
+                  onPressed: (context) {
+                    switch (action) {
+                      case RecordAction.rename:
+                        _rename(context, record, scannerBloc);
+                        break;
+                      case RecordAction.delete:
+                        scannerBloc.add(ScannerEventDelete(record));
+                        break;
+                      case RecordAction.share:
+                        scannerBloc.add(ScannerEventShare(record));
+                        break;
+                    }
+                  },
+                  icon: action.icon,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  foregroundColor: action.foregroundColor,
+                ),
+              )
+              .toList(),
         ),
+        child: ListTile(
+            leading: Icon(record.type.icon),
+            onTap: () => onTap(record),
+            title: Text(record.name.isEmpty ? record.displayName : record.name),
+            subtitle: Text(record.displayData),
+            trailing: IconButton(
+              style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all(
+                  record.canOpen
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.onSurface,
+                ),
+                shape: MaterialStateProperty.all(
+                  const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    // side: BorderSide(color: Colors.grey),
+                  ),
+                ),
+                shadowColor: MaterialStateProperty.all(
+                    Theme.of(context).colorScheme.shadow),
+                elevation: MaterialStateProperty.all(3),
+                backgroundColor: MaterialStateProperty.all(
+                    Theme.of(context).colorScheme.primaryContainer),
+              ),
+              onPressed: () {
+                if (record.canOpen) {
+                  scannerBloc.add(ScannerEventOpenUrl(record));
+                  return;
+                }
+                scannerBloc.add(ScannerEventCopy(record));
+              },
+              icon: record.canOpen
+                  ? const Icon(Icons.open_in_new)
+                  : const Icon(Icons.copy),
+            )),
       ),
     );
   }

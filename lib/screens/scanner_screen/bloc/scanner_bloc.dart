@@ -1,3 +1,4 @@
+import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
@@ -7,6 +8,7 @@ import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
@@ -22,7 +24,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     on<ScannerEventDelete>(_onDelete);
     on<ScannerEventOnTap>(_onTap);
     on<ScannerEventOnLongPress>(_onLongPress);
-    on<ScannerEventOnShare>(_onShare);
+    on<ScannerEventShare>(_onShare);
+    on<ScannerEventCopy>(_onCopy);
+    on<ScannerEventOpenUrl>(_openUrl);
   }
 
   void _onInit(ScannerEventInit event, Emitter<ScannerState> emit) async {
@@ -105,8 +109,43 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     ));
   }
 
-  void _onShare(ScannerEventOnShare event, Emitter<ScannerState> emit) {
+  void _onShare(ScannerEventShare event, Emitter<ScannerState> emit) {
     var record = event.record;
     Share.share(record.data, subject: record.name);
+  }
+
+  void _onCopy(ScannerEventCopy event, Emitter<ScannerState> emit) {
+    var record = event.record;
+    Clipboard.setData(ClipboardData(text: record.copyData));
+    emit(
+      state.copyWith(
+        msg: StateMessage(message: '${record.name} Copied to clipboard'),
+      ),
+    );
+  }
+
+  void _openUrl(ScannerEventOpenUrl event, Emitter<ScannerState> emit) async {
+    if (event.record is! Url) {
+      emit(
+        state.copyWith(
+          msg: StateMessage(
+            message: 'Invalid record type',
+            type: StateMessageType.error,
+          ),
+        ),
+      );
+    }
+    var record = event.record as Url;
+    if (!await canLaunchUrl(record.url)) {
+      emit(
+        state.copyWith(
+          msg: StateMessage(
+            message: 'Invalid url',
+            type: StateMessageType.error,
+          ),
+        ),
+      );
+    }
+    await launchUrl(record.url);
   }
 }

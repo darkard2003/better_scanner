@@ -37,7 +37,17 @@ class ScannerEventRename extends ScannerEvent {
   const ScannerEventRename(this.record, this.name);
 }
 
-class ScannerEventOnShare extends ScannerEvent {
+class ScannerEventShare extends ScannerEvent {
   final QrRecordModel record;
-  const ScannerEventOnShare(this.record);
+  const ScannerEventShare(this.record);
+}
+
+class ScannerEventCopy extends ScannerEvent {
+  final QrRecordModel record;
+  const ScannerEventCopy(this.record);
+}
+
+class ScannerEventOpenUrl extends ScannerEvent {
+  final QrRecordModel record;
+  const ScannerEventOpenUrl(this.record);
 }

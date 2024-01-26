@@ -29,7 +29,9 @@ class ScannerView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: Image.asset('assets/images/icon.png'),
         title: const Text('Better Scanner'),
+        centerTitle: true,
       ),
       body: Column(
         children: [
