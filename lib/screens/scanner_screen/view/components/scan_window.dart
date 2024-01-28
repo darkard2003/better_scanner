@@ -6,32 +6,20 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScanWindow extends StatefulWidget {
   final Function(QrRecordModel record) onDetect;
-  final double dimension;
-  const ScanWindow({super.key, required this.onDetect, this.dimension = 300});
+  final double size;
+  final MobileScannerController controller;
+  const ScanWindow({
+    super.key,
+    required this.onDetect,
+    this.size = 300,
+    required this.controller,
+  });
 
   @override
   State<ScanWindow> createState() => _ScanWindowState();
 }
 
 class _ScanWindowState extends State<ScanWindow> {
-  late final MobileScannerController _controller;
-  bool _cameraEnabled = false;
-  bool _hasTorch = false;
-
-  Future<void> _start() async {
-    _cameraEnabled = true;
-    setState(() {});
-    var args = await _controller.start();
-    _hasTorch = args?.hasTorch ?? false;
-    setState(() {});
-  }
-
-  Future<void> _stop() async {
-    await _controller.stop();
-    _cameraEnabled = false;
-    setState(() {});
-  }
-
   void translate(BarcodeCapture capture, BuildContext context) {
     var codes = capture.barcodes;
     for (var code in codes) {
@@ -50,125 +38,50 @@ class _ScanWindowState extends State<ScanWindow> {
     }
   }
 
-  Iterable<Widget> _buildActions() sync* {
-    yield IconButton(
-      onPressed: () async {
-        if (!_cameraEnabled) {
-          await _start();
-        } else {
-          await _stop();
-        }
-      },
-      icon: _cameraEnabled
-          ? const Icon(Icons.camera)
-          : const Icon(
-              Icons.camera_alt_outlined,
-            ),
-    );
-
-    yield ValueListenableBuilder(
-      valueListenable: _controller.cameraFacingState,
-      builder: (context, value, child) {
-        return IconButton(
-          onPressed: _cameraEnabled
-              ? () async {
-                  await _controller.switchCamera();
-                }
-              : null,
-          icon: value == CameraFacing.back
-              ? const Icon(Icons.camera_front_outlined)
-              : const Icon(Icons.camera_rear_outlined),
-        );
-      },
-      child: IconButton(
-        onPressed: _cameraEnabled
-            ? () async {
-                await _controller.switchCamera();
-              }
-            : null,
-        icon: const Icon(Icons.switch_camera_outlined),
-      ),
-    );
-    yield ValueListenableBuilder(
-        valueListenable: _controller.torchState,
-        builder: (context, value, child) {
-          return IconButton(
-            onPressed: _hasTorch && _cameraEnabled
-                ? () async {
-                    await _controller.toggleTorch();
-                  }
-                : null,
-            icon: value == TorchState.off
-                ? const Icon(Icons.flash_on_outlined)
-                : const Icon(Icons.flash_off_outlined),
-          );
-        });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = MobileScannerController(
-      detectionSpeed: DetectionSpeed.noDuplicates,
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.stop();
-    _controller.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, contrains) {
-        var maxWidth = contrains.maxWidth;
-        var maxHeight = contrains.maxHeight;
-        var minConstraint = maxWidth < maxHeight ? maxWidth : maxHeight;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox.square(
-              dimension: minConstraint * 0.7,
-              child: Card(
-                elevation: 10,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Stack(
-                    children: [
-                      MobileScanner(
-                        controller: _controller,
-                        startDelay: kIsWeb,
-                        onDetect: (capture) => translate(capture, context),
-                        onScannerStarted: (arguments) => setState(() {
-                          _cameraEnabled = true;
-                          _hasTorch = arguments?.hasTorch ?? false;
-                        }),
-                      ),
-                      if (!_cameraEnabled)
-                        const Center(
-                          child: Text(
-                            "Camera disabled",
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
+    return SizedBox.square(
+      dimension: widget.size,
+      child: Card(
+        elevation: 10,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Stack(
+            children: [
+              MobileScanner(
+                controller: widget.controller,
+                startDelay: kIsWeb,
+                onDetect: (capture) => translate(capture, context),
               ),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: _buildActions().toList(),
-            ),
-          ],
-        );
-      },
+            ],
+          ),
+        ),
+      ),
     );
   }
+}
+
+Iterable<Widget> buildActions(
+    BuildContext context, MobileScannerController controller) sync* {
+  yield ValueListenableBuilder(
+      valueListenable: controller.cameraFacingState,
+      builder: (context, value, child) {
+        return IconButton(
+          icon: Icon(value == CameraFacing.back
+              ? Icons.camera_front
+              : Icons.camera_rear),
+          onPressed: () => controller.switchCamera(),
+        );
+      });
+  yield ValueListenableBuilder(
+    valueListenable: controller.torchState,
+    builder: (context, value, child) {
+      return IconButton(
+        icon: Icon(value == TorchState.off ? Icons.flash_off : Icons.flash_on),
+        onPressed: () => controller.hasTorch ? controller.toggleTorch() : null,
+      );
+    },
+  );
 }
 
 extension on BarcodeType {

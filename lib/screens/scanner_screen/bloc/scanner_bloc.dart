@@ -7,6 +7,7 @@ import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,6 +17,7 @@ export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   late Database db;
   var records = <QrRecordModel>[];
+  late final MobileScannerController controller;
 
   ScannerBloc() : super(ScannerStateUninitialized()) {
     on<ScannerEventInit>(_onInit);
@@ -31,13 +33,22 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
   void _onInit(ScannerEventInit event, Emitter<ScannerState> emit) async {
     db = await DBProvider.useDB(DBType.hive, 'user');
+    controller = MobileScannerController(
+      autoStart: true,
+      detectionSpeed: DetectionSpeed.noDuplicates,
+    );
+    await controller.start();
     try {
       records = await db.getRecords();
-      emit(ScannerScreenState(qrCodes: records));
+      emit(ScannerScreenState(
+        qrCodes: records,
+        controller: controller,
+      ));
     } catch (e) {
       emit(
         ScannerScreenState(
           qrCodes: [],
+          controller: controller,
           msg: StateMessage(
             message: e.toString(),
             type: StateMessageType.error,
@@ -53,6 +64,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     emit(
       ScannerScreenState(
         qrCodes: records,
+        controller: controller,
         msg: StateMessage(message: 'Added ${event.record.name}'),
       ),
     );
@@ -66,6 +78,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     records = await db.getRecords();
     emit(ScannerScreenState(
       qrCodes: records,
+      controller: controller,
       msg: StateMessage(message: 'Renamed $name to ${event.name}'),
     ));
   }
@@ -77,6 +90,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     emit(
       ScannerScreenState(
         qrCodes: records,
+        controller: controller,
         msg: StateMessage(
           message: "Deleted ${record.name}",
           action: MessageAction('Undo', () {
@@ -94,6 +108,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     } else {
       Clipboard.setData(ClipboardData(text: record.copyData));
       emit(ScannerScreenState(
+        controller: controller,
         qrCodes: records,
         msg: StateMessage(message: 'Copied to clipboard'),
       ));
@@ -105,6 +120,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Clipboard.setData(ClipboardData(text: record.copyData));
     emit(ScannerScreenState(
       qrCodes: records,
+      controller: controller,
       msg: StateMessage(message: 'Copied to clipboard'),
     ));
   }

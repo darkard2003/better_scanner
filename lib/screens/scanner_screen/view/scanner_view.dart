@@ -3,6 +3,7 @@ import 'package:better_scanner/screens/scanner_screen/view/components/record_lis
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'components/scan_window.dart';
 
@@ -27,42 +28,76 @@ class _ScannerViewState extends State<ScannerView> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Scaffold(
-          appBar: AppBar(
-            leading: Image.asset('assets/images/icon.png'),
-            title: const Text('Better Scanner'),
-            centerTitle: true,
-          ),
-          body: constraints.maxWidth < 700
-              ? Column(
-                  children: [
-                    const ScanView(),
-                    Expanded(child: HistoryView(state: widget.state)),
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const ScanView(),
-                    Expanded(child: HistoryView(state: widget.state)),
-                  ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: Image.asset('assets/images/icon.png'),
+        title: const Text('Better Scanner'),
+        centerTitle: true,
+      ),
+      body: LayoutBuilder(builder: (context, constraints) {
+        if (constraints.maxWidth < 700) {
+          return Column(
+            children: [
+              ScanView(
+                dimentions: constraints.maxHeight * 0.5 - 50,
+                controller: widget.state.controller,
+              ),
+              SizedBox(
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:
+                      buildActions(context, widget.state.controller).toList(),
                 ),
+              ),
+              SizedBox(
+                height: constraints.maxHeight * 0.5,
+                child: HistoryView(state: widget.state),
+              ),
+            ],
+          );
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(width: 10),
+            ScanView(
+              dimentions: constraints.maxWidth * 0.4 - 60,
+              controller: widget.state.controller,
+            ),
+            SizedBox(
+              width: 50,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:
+                    buildActions(context, widget.state.controller).toList(),
+              ),
+            ),
+            SizedBox(
+              width: constraints.maxWidth * 0.5,
+              child: HistoryView(state: widget.state),
+            ),
+          ],
         );
-      },
+      }),
     );
   }
 }
 
 class ScanView extends StatelessWidget {
+  final MobileScannerController controller;
+  final double dimentions;
   const ScanView({
     super.key,
+    required this.controller,
+    required this.dimentions,
   });
 
   @override
   Widget build(BuildContext context) {
     return ScanWindow(
+      controller: controller,
+      size: dimentions,
       onDetect: (record) {
         BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
       },
@@ -81,7 +116,7 @@ class HistoryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 700),
+      constraints: const BoxConstraints(maxWidth: 600),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceVariant,
         borderRadius: const BorderRadius.only(
