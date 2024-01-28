@@ -62,13 +62,10 @@ class ScanView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ScanWindow(
-        onDetect: (record) {
-          BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
-        },
-      ),
+    return ScanWindow(
+      onDetect: (record) {
+        BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
+      },
     );
   }
 }

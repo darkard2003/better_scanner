@@ -88,8 +88,16 @@ class RecordCard extends StatelessWidget {
         child: ListTile(
             leading: Icon(record.type.icon),
             onTap: () => onTap(record),
-            title: Text(record.name.isEmpty ? record.displayName : record.name),
-            subtitle: Text(record.displayData),
+            title: Text(
+              record.name.isEmpty ? record.displayName : record.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              record.displayData,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             trailing: IconButton(
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all(
