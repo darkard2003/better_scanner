@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
             seedColor: Colors.cyan, brightness: Brightness.dark),
       ),
       home: BlocProvider<ScannerBloc>(
-          create: (context) => ScannerBloc(), child: const ScannerScreen()),
+        create: (context) => ScannerBloc(),
+        child: const ScannerScreen(),
+      ),
     );
   }
 }

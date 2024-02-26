@@ -1,6 +1,5 @@
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
-import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -16,14 +15,64 @@ class ScannerView extends StatefulWidget {
 }
 
 class _ScannerViewState extends State<ScannerView> {
+  late MobileScannerController _controller;
+  bool _cameraEnabled = true;
+
   @override
   void initState() {
     super.initState();
-    if (widget.state.msg != null) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        widget.state.msg?.show(context);
-      });
-    }
+    _controller = MobileScannerController(
+      facing: CameraFacing.back,
+    );
+  }
+
+  List<Widget> _buildActions() {
+    return [
+      // Camera enable/disable
+      IconButton(
+        icon: Icon(
+          _cameraEnabled ? Icons.camera_alt : Icons.camera_alt_outlined,
+        ),
+        onPressed: () {
+          _cameraEnabled ? _controller.stop() : _controller.start();
+          _cameraEnabled = !_cameraEnabled;
+          setState(() {});
+        },
+      ),
+      // Flash enable/disable
+      ValueListenableBuilder(
+        valueListenable: _controller.torchState,
+        builder: (context, value, widget) {
+          bool torchEnabled = value == TorchState.on;
+          return IconButton(
+            icon: Icon(
+              torchEnabled ? Icons.flash_on : Icons.flash_off,
+            ),
+            onPressed: _controller.hasTorch
+                ? () {
+                    torchEnabled
+                        ? _controller.toggleTorch()
+                        : _controller.toggleTorch();
+                  }
+                : null,
+          );
+        },
+      ),
+
+      ValueListenableBuilder(
+          valueListenable: _controller.cameraFacingState,
+          builder: (context, value, widget) {
+            bool cameraFacingBack = value == CameraFacing.back;
+            return IconButton(
+              icon: Icon(
+                cameraFacingBack ? Icons.camera_front : Icons.camera_rear,
+              ),
+              onPressed: () {
+                _controller.switchCamera();
+              },
+            );
+          }),
+    ];
   }
 
   @override
@@ -40,14 +89,13 @@ class _ScannerViewState extends State<ScannerView> {
             children: [
               ScanView(
                 dimentions: constraints.maxHeight * 0.5 - 50,
-                controller: widget.state.controller,
+                controller: _controller,
               ),
               SizedBox(
                 height: 50,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children:
-                      buildActions(context, widget.state.controller).toList(),
+                  children: _buildActions(),
                 ),
               ),
               SizedBox(
@@ -63,15 +111,14 @@ class _ScannerViewState extends State<ScannerView> {
             const SizedBox(width: 10),
             ScanView(
               dimentions: constraints.maxWidth * 0.4 - 60,
-              controller: widget.state.controller,
+              // controller: widget.state.controller,
             ),
-            SizedBox(
+            const SizedBox(
               width: 50,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children:
-                    buildActions(context, widget.state.controller).toList(),
-              ),
+                  mainAxisAlignment: MainAxisAlignment.center, children: []
+                  // buildActions(context, widget.state.controller).toList(),
+                  ),
             ),
             SizedBox(
               width: constraints.maxWidth * 0.5,
@@ -85,11 +132,12 @@ class _ScannerViewState extends State<ScannerView> {
 }
 
 class ScanView extends StatelessWidget {
-  final MobileScannerController controller;
+  final MobileScannerController? controller;
+
   final double dimentions;
   const ScanView({
     super.key,
-    required this.controller,
+    this.controller,
     required this.dimentions,
   });
 

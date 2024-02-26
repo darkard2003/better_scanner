@@ -1,18 +1,17 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScanWindow extends StatefulWidget {
   final Function(QrRecordModel record) onDetect;
   final double size;
-  final MobileScannerController controller;
+  final MobileScannerController? controller;
   const ScanWindow({
     super.key,
     required this.onDetect,
     this.size = 300,
-    required this.controller,
+    this.controller,
   });
 
   @override
@@ -20,6 +19,7 @@ class ScanWindow extends StatefulWidget {
 }
 
 class _ScanWindowState extends State<ScanWindow> {
+  late MobileScannerController _controller;
   void translate(BarcodeCapture capture, BuildContext context) {
     var codes = capture.barcodes;
     for (var code in codes) {
@@ -39,6 +39,21 @@ class _ScanWindowState extends State<ScanWindow> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ??
+        MobileScannerController(
+          detectionSpeed: DetectionSpeed.noDuplicates,
+        );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox.square(
       dimension: widget.size,
@@ -49,8 +64,9 @@ class _ScanWindowState extends State<ScanWindow> {
           child: Stack(
             children: [
               MobileScanner(
-                controller: widget.controller,
-                startDelay: kIsWeb,
+                // controller: widget.controller,
+                // startDelay: true,
+                controller: _controller,
                 onDetect: (capture) => translate(capture, context),
               ),
             ],
