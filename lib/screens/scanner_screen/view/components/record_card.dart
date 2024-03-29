@@ -36,11 +36,9 @@ extension on RecordAction {
 
 class RecordCard extends StatelessWidget {
   final QrRecordModel record;
-  final Function(QrRecordModel record) onTap;
   const RecordCard({
     super.key,
     required this.record,
-    required this.onTap,
   });
 
   void _rename(BuildContext context, QrRecordModel record,
@@ -87,7 +85,9 @@ class RecordCard extends StatelessWidget {
         ),
         child: ListTile(
             leading: Icon(record.type.icon),
-            onTap: () => onTap(record),
+            onTap: () => scannerBloc.add(
+                  ScannerEventOnTap(record, context),
+                ),
             title: Text(
               record.name.isEmpty ? record.displayName : record.name,
               maxLines: 1,

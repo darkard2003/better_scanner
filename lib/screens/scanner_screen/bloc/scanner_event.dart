@@ -1,4 +1,5 @@
 import 'package:better_scanner/models/qr_record_model.dart';
+import 'package:flutter/widgets.dart';
 
 abstract class ScannerEvent {
   const ScannerEvent();
@@ -23,7 +24,8 @@ class ScannerEventUpdate extends ScannerEvent {
 
 class ScannerEventOnTap extends ScannerEvent {
   final QrRecordModel record;
-  const ScannerEventOnTap(this.record);
+  final BuildContext context;
+  const ScannerEventOnTap(this.record, this.context);
 }
 
 class ScannerEventOnLongPress extends ScannerEvent {
@@ -51,3 +53,4 @@ class ScannerEventOpenUrl extends ScannerEvent {
   final QrRecordModel record;
   const ScannerEventOpenUrl(this.record);
 }
+

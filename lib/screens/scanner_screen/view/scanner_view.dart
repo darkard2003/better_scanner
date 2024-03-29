@@ -1,3 +1,4 @@
+import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class _ScannerViewState extends State<ScannerView> {
     super.initState();
     _controller = MobileScannerController(
       facing: CameraFacing.back,
+      detectionSpeed: DetectionSpeed.noDuplicates,
     );
   }
 
@@ -100,7 +102,9 @@ class _ScannerViewState extends State<ScannerView> {
               ),
               SizedBox(
                 height: constraints.maxHeight * 0.5,
-                child: HistoryView(state: widget.state),
+                child: HistoryView(
+                  state: widget.state,
+                ),
               ),
             ],
           );
@@ -113,12 +117,12 @@ class _ScannerViewState extends State<ScannerView> {
               dimentions: constraints.maxWidth * 0.4 - 60,
               // controller: widget.state.controller,
             ),
-            const SizedBox(
+            SizedBox(
               width: 50,
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, children: []
-                  // buildActions(context, widget.state.controller).toList(),
-                  ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _buildActions(),
+              ),
             ),
             SizedBox(
               width: constraints.maxWidth * 0.5,
@@ -191,9 +195,6 @@ class HistoryView extends StatelessWidget {
         ),
         RecordListViewSliver(
           records: state.qrCodes,
-          onTap: (record) {
-            // _onTap(record, context);
-          },
         ),
       ]),
     );

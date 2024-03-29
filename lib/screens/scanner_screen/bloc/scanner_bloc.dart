@@ -6,6 +6,7 @@ import 'package:better_scanner/screens/scanner_screen/bloc/state_message.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,6 +30,33 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     on<ScannerEventOpenUrl>(_openUrl);
   }
 
+  void _onCopy(ScannerEventCopy event, Emitter<ScannerState> emit) {
+    var record = event.record;
+    Clipboard.setData(ClipboardData(text: record.copyData));
+    emit(
+      state.copyWith(
+        msg: StateMessage(message: '${record.name} Copied to clipboard'),
+      ),
+    );
+  }
+
+  void _onDelete(ScannerEventDelete event, Emitter<ScannerState> emit) async {
+    var record = event.record;
+    await db.deleteRecord(record);
+    records = await db.getRecords();
+    emit(
+      ScannerScreenState(
+        qrCodes: records,
+        msg: StateMessage(
+          message: "Deleted ${record.name}",
+          action: MessageAction('Undo', () {
+            add(ScannerEventScan(record));
+          }),
+        ),
+      ),
+    );
+  }
+
   void _onInit(ScannerEventInit event, Emitter<ScannerState> emit) async {
     db = await DBProvider.useDB(DBType.hive, 'user');
     try {
@@ -49,15 +77,13 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     }
   }
 
-  void _onScan(ScannerEventScan event, Emitter<ScannerState> emit) async {
-    await db.addRecord(event.record);
-    records = await db.getRecords();
-    emit(
-      ScannerScreenState(
-        qrCodes: records,
-        msg: StateMessage(message: 'Added ${event.record.name}'),
-      ),
-    );
+  void _onLongPress(ScannerEventOnLongPress event, Emitter<ScannerState> emit) {
+    var record = event.record;
+    Clipboard.setData(ClipboardData(text: record.copyData));
+    emit(ScannerScreenState(
+      qrCodes: records,
+      msg: StateMessage(message: 'Copied to clipboard'),
+    ));
   }
 
   void _onRename(ScannerEventRename event, Emitter<ScannerState> emit) async {
@@ -72,43 +98,15 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     ));
   }
 
-  void _onDelete(ScannerEventDelete event, Emitter<ScannerState> emit) async {
-    var record = event.record;
-    await db.deleteRecord(record);
+  void _onScan(ScannerEventScan event, Emitter<ScannerState> emit) async {
+    await db.addRecord(event.record);
     records = await db.getRecords();
     emit(
       ScannerScreenState(
         qrCodes: records,
-        msg: StateMessage(
-          message: "Deleted ${record.name}",
-          action: MessageAction('Undo', () {
-            add(ScannerEventScan(record));
-          }),
-        ),
+        msg: StateMessage(message: 'Added ${event.record.name}'),
       ),
     );
-  }
-
-  void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
-    var record = event.record;
-    if (record.canOpen) {
-      // TODO: implement open
-    } else {
-      Clipboard.setData(ClipboardData(text: record.copyData));
-      emit(ScannerScreenState(
-        qrCodes: records,
-        msg: StateMessage(message: 'Copied to clipboard'),
-      ));
-    }
-  }
-
-  void _onLongPress(ScannerEventOnLongPress event, Emitter<ScannerState> emit) {
-    var record = event.record;
-    Clipboard.setData(ClipboardData(text: record.copyData));
-    emit(ScannerScreenState(
-      qrCodes: records,
-      msg: StateMessage(message: 'Copied to clipboard'),
-    ));
   }
 
   void _onShare(ScannerEventShare event, Emitter<ScannerState> emit) {
@@ -116,13 +114,14 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Share.share(record.data, subject: record.name);
   }
 
-  void _onCopy(ScannerEventCopy event, Emitter<ScannerState> emit) {
+  void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
     var record = event.record;
-    Clipboard.setData(ClipboardData(text: record.copyData));
-    emit(
-      state.copyWith(
-        msg: StateMessage(message: '${record.name} Copied to clipboard'),
-      ),
+    var context = event.context;
+
+    var res = await Navigator.pushNamed(
+      context,
+      '/details',
+      arguments: {'qr': record},
     );
   }
 

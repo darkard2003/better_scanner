@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 
 class RecordListViewSliver extends StatelessWidget {
   final List<QrRecordModel> records;
-  final Function(QrRecordModel record) onTap;
 
   const RecordListViewSliver({
     super.key,
     required this.records,
-    required this.onTap,
   });
 
   @override
@@ -17,7 +15,6 @@ class RecordListViewSliver extends StatelessWidget {
     return SliverList.builder(
       itemBuilder: (context, i) => RecordCard(
         record: records[i],
-        onTap: onTap,
       ),
       itemCount: records.length,
     );

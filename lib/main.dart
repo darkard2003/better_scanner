@@ -1,3 +1,4 @@
+import 'package:better_scanner/screens/details_screen/details_screen.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/scanner_screen.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.cyan, brightness: Brightness.dark),
       ),
+      routes: {
+        '/details': (context) => const DetailsScreen(),
+      },
       home: BlocProvider<ScannerBloc>(
         create: (context) => ScannerBloc(),
         child: const ScannerScreen(),
