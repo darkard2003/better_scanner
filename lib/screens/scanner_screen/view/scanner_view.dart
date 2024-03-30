@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -18,6 +21,12 @@ class ScannerView extends StatefulWidget {
 class _ScannerViewState extends State<ScannerView> {
   late MobileScannerController _controller;
   bool _cameraEnabled = true;
+
+  // void loadFile() async {
+  //   var fileResult = await FilePicker.platform.pickFiles();
+  //   if (fileResult == null) return;
+  //   File file = File(fileResult.files.single.path!);
+  // }
 
   @override
   void initState() {
