@@ -1,4 +1,5 @@
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/screens/qr_generator_screen/generators/qr_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/qr_generator_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -52,6 +53,8 @@ class QrGeneratorView extends StatelessWidget {
             },
             itemCount: QrType.values.length,
           ),
+          const SizedBox(height: 16),
+          QrGenerator(type: state.type, onGenerate: vm.updateQrRecord),
         ],
       ),
     );

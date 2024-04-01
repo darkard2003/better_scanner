@@ -2,15 +2,15 @@ import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:flutter/material.dart';
 
-class PlainTextQr extends StatefulWidget {
+class TextQrGenerator extends StatefulWidget {
   final Function(QrRecordModel) onQrGenerated;
-  const PlainTextQr({super.key, required this.onQrGenerated});
+  const TextQrGenerator({super.key, required this.onQrGenerated});
 
   @override
-  State<PlainTextQr> createState() => _PlainTextQrState();
+  State<TextQrGenerator> createState() => _TextQrGeneratorState();
 }
 
-class _PlainTextQrState extends State<PlainTextQr> {
+class _TextQrGeneratorState extends State<TextQrGenerator> {
   QrRecordModel _qrRecord = QrRecordModel.fromText('');
 
   @override
