@@ -17,8 +17,9 @@ class QrGeneratorView extends StatelessWidget {
       errorCorrectLevel: QrErrorCorrectLevel.H,
     );
     var qrImage = QrImage(qrCode);
+    // ignore: non_const_call_to_literal_constructor
     var qrDecoration = PrettyQrDecoration(
-      backgroundColor: Colors.black,
+      background: Colors.black,
     );
     var theme = Theme.of(context);
     return Scaffold(
@@ -34,7 +35,10 @@ class QrGeneratorView extends StatelessWidget {
             ),
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.all(16),
-            child: PrettyQrView(qrImage: qrImage),
+            child: PrettyQrView(
+              decoration: qrDecoration,
+              qrImage: qrImage,
+            ),
           ),
           const SizedBox(height: 16),
           ListView.builder(
