@@ -24,11 +24,10 @@ class QrRecordModel {
   String get copyData => data;
   bool get canOpen => false;
 
-  factory QrRecordModel.fromText(String text) {
-    var id = const Uuid().v4().toString();
+  factory QrRecordModel.fromText(String text, {String? uuid}) {
     var createdAt = DateTime.now();
     return QrRecordModel(
-      id: id,
+      id: uuid ?? const Uuid().v4().toString(),
       name: '',
       data: text,
       type: QrType.text,
