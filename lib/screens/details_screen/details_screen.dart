@@ -37,7 +37,7 @@ class DetailsScreen extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 32),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(
@@ -113,4 +113,3 @@ class DetailsScreen extends StatelessWidget {
     );
   }
 }
-

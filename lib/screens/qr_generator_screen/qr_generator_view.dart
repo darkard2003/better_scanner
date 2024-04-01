@@ -1,4 +1,5 @@
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/qr_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/qr_generator_vm.dart';
@@ -32,13 +33,12 @@ class QrGeneratorView extends StatelessWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurface,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.all(16),
             child: PrettyQrView(
-              decoration: qrDecoration,
               qrImage: qrImage,
             ),
           ),
@@ -46,13 +46,19 @@ class QrGeneratorView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                icon: const Icon(Icons.save),
+              CustomIconButton(
+                icon: Icon(
+                  Icons.save,
+                  color: theme.colorScheme.onPrimary,
+                ),
                 onPressed: vm.save,
               ),
               const SizedBox(width: 16),
-              IconButton(
-                icon: const Icon(Icons.share),
+              CustomIconButton(
+                icon: Icon(
+                  Icons.share,
+                  color: theme.colorScheme.onPrimary,
+                ),
                 onPressed: () {},
               ),
             ],

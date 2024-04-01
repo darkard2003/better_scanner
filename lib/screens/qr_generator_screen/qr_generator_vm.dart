@@ -13,6 +13,7 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
           type: QrType.text,
         ));
 
+  var name = '';
   void updateQrRecord(QrRecordModel qrRecord) {
     emit(state.copyWith(qrRecord: qrRecord));
   }
@@ -22,10 +23,11 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
   }
 
   void save() {
+    state.qrRecord.name = name;
     Navigator.of(context).pop(state.qrRecord);
   }
 
   void updateName(String name) {
-    state.qrRecord.name = name;
+    this.name = name;
   }
 }
