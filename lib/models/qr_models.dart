@@ -1,10 +1,13 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/models/wifi_security.dart';
 import 'package:uuid/uuid.dart';
 
 class WifiCred extends QrRecordModel {
   late String ssid;
   late String password;
+  late WifiSecurity security;
+  late bool hidden;
 
   WifiCred({
     required super.id,
@@ -13,13 +16,33 @@ class WifiCred extends QrRecordModel {
     required super.type,
     required super.createdAt,
   }) {
-    var parts = data.split(';');
+    var raw = data.split('WIFI:')[1];
+    var parts = raw.split(';');
+    var securityString = "";
     for (var part in parts) {
       if (part.startsWith('S:')) {
         ssid = part.split(':')[1];
       } else if (part.startsWith('P:')) {
         password = part.split(':')[1];
+      } else if (part.startsWith('T:')) {
+        securityString = part.split(':').last;
+      } else if (part.startsWith('H:')) {
+        hidden = part.split(':').last.toLowerCase() == 'true';
       }
+    }
+    switch (securityString.toUpperCase()) {
+      case 'wep':
+        security = WifiSecurity.WEP;
+        break;
+      case 'wpa':
+        security = WifiSecurity.WPA;
+        break;
+      case 'nopass':
+        security = WifiSecurity.None;
+        break;
+      default:
+        security = WifiSecurity.None;
+        break;
     }
   }
 
@@ -32,10 +55,15 @@ class WifiCred extends QrRecordModel {
   @override
   String get copyData => password;
 
-  factory WifiCred.fromSSIDPassword(String ssid, String password) {
+  factory WifiCred.fromSSIDPassword(
+    String ssid,
+    String password, {
+    WifiSecurity security = WifiSecurity.WPA,
+    bool hidden = false,
+  }) {
     var id = const Uuid().v4().toString();
     var createdAt = DateTime.now();
-    var data = "WIFI:S:$ssid;T:;P:$password;;";
+    var data = "WIFI:T:${security.name};S:$ssid;P:$password;H:${hidden ? 'true': ''};;";
     return WifiCred(
       id: id,
       name: '',

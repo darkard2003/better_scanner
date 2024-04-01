@@ -1,4 +1,5 @@
 import 'package:better_scanner/screens/details_screen/details_screen.dart';
+import 'package:better_scanner/screens/qr_generator_screen/qr_generator.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/scanner_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/details': (context) => const DetailsScreen(),
+        '/generator': (context) => const QrGeneratorScreen(),
       },
       home: BlocProvider<ScannerBloc>(
         create: (context) => ScannerBloc(),

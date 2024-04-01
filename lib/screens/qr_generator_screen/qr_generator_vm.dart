@@ -20,4 +20,12 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
   void updateType(QrType type) {
     emit(state.copyWith(type: type));
   }
+
+  void save() {
+    Navigator.of(context).pop(state.qrRecord);
+  }
+
+  void updateName(String name) {
+    state.qrRecord.name = name;
+  }
 }

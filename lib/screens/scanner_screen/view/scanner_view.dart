@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -186,17 +183,25 @@ class HistoryView extends StatelessWidget {
         ),
       ),
       child: CustomScrollView(slivers: [
-        const SliverAppBar(
-          title: Text(
+        SliverAppBar(
+          title: const Text(
             'History',
           ),
           floating: true,
           snap: true,
-          leading: Icon(Icons.history),
+          leading: const Icon(Icons.history),
           actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: Icon(Icons.search),
+            const Icon(Icons.search),
+            IconButton(
+              icon: const Icon(Icons.qr_code),
+              onPressed: () async {
+                var record =
+                    await Navigator.of(context).pushNamed('/generator');
+                if (record == null) return;
+                if (!context.mounted) return;
+                BlocProvider.of<ScannerBloc>(context)
+                    .add(ScannerEventScan(record as QrRecordModel));
+              },
             ),
           ],
           backgroundColor: Colors.transparent,
