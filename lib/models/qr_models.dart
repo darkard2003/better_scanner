@@ -1,4 +1,6 @@
 import 'package:better_scanner/models/qr_record_model.dart';
+import 'package:better_scanner/models/qr_type.dart';
+import 'package:uuid/uuid.dart';
 
 class WifiCred extends QrRecordModel {
   late String ssid;
@@ -29,6 +31,19 @@ class WifiCred extends QrRecordModel {
 
   @override
   String get copyData => password;
+
+  factory WifiCred.fromSSIDPassword(String ssid, String password) {
+    var id = const Uuid().v4().toString();
+    var createdAt = DateTime.now();
+    var data = "WIFI:S:$ssid;T:;P:$password;;";
+    return WifiCred(
+      id: id,
+      name: '',
+      data: data,
+      type: QrType.wifi,
+      createdAt: createdAt,
+    );
+  }
 }
 
 class GeoLocation extends QrRecordModel {
