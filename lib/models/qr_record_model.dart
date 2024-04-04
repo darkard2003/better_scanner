@@ -44,7 +44,7 @@ class QrRecordModel {
   }) {
     switch (type) {
       case QrType.url:
-        return Url(
+        return UrlQrModel(
           id: id,
           name: name,
           data: data,

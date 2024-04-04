@@ -100,10 +100,10 @@ class GeoLocation extends QrRecordModel {
   String get copyData => '$latitude,$longitude';
 }
 
-class Url extends QrRecordModel {
+class UrlQrModel extends QrRecordModel {
   late Uri url;
 
-  Url({
+  UrlQrModel({
     required super.id,
     required super.name,
     required super.data,

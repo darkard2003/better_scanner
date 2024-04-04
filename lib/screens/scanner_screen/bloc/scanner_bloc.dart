@@ -126,7 +126,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   }
 
   void _openUrl(ScannerEventOpenUrl event, Emitter<ScannerState> emit) async {
-    if (event.record is! Url) {
+    if (event.record is! UrlQrModel) {
       emit(
         state.copyWith(
           msg: StateMessage(
@@ -136,7 +136,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         ),
       );
     }
-    var record = event.record as Url;
+    var record = event.record as UrlQrModel;
     if (!await canLaunchUrl(record.url)) {
       emit(
         state.copyWith(
