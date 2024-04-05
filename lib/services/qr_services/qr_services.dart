@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:flutter/services.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,10 +11,8 @@ import 'package:image/image.dart';
 
 class QrServices {
   static Future<void> copyToClipboard(QrRecordModel qr) async {
-    await Share.share(
-      qr.copyData,
-      subject: qr.displayName,
-    );
+    var data = ClipboardData(text: qr.copyData);
+    await Clipboard.setData(data);
   }
 
   static Future<bool> canLaunch(QrRecordModel qr) async {
@@ -48,5 +47,13 @@ class QrServices {
     var xfile = XFile.fromData(paddedImage.getBytes());
     await Share.shareXFiles([xfile], text: qr.displayName);
   }
-}
 
+  static Future<void> shareQrText(QrRecordModel qr) async {
+    if (qr.runtimeType == UrlQrModel) {
+      qr = qr as UrlQrModel;
+      await Share.shareUri(qr.url);
+      return;
+    }
+    await Share.share(qr.copyData, subject: qr.displayName);
+  }
+}

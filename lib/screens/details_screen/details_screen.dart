@@ -1,8 +1,8 @@
-import 'dart:ui';
-
+import 'package:better_scanner/screens/components/custom_icon_button.dart';
+import 'package:better_scanner/screens/shared/show_snackbar.dart';
+import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../models/qr_record_model.dart';
 
@@ -59,27 +59,7 @@ class DetailsScreen extends StatelessWidget {
                         color: theme.colorScheme.surface,
                       ),
                       onPressed: () async {
-                        var image = await qrImage.toImage(
-                          size: 800,
-                          decoration: const PrettyQrDecoration(
-                            background: Colors.white,
-                            image: PrettyQrDecorationImage(
-                              image: AssetImage('assets/images/icon.png'),
-                            ),
-                          ),
-                        );
-                        var byte = await image.toByteData(
-                          format: ImageByteFormat.png,
-                        );
-                        var xFile = XFile.fromData(
-                          byte!.buffer.asUint8List(),
-                          mimeType: 'image/png',
-                          name: '${qr.displayName}.png',
-                        );
-                        Share.shareXFiles(
-                          [xFile],
-                          subject: qr.displayName,
-                        );
+                        await QrServices.shareQrImage(qr);
                       },
                     ),
                   ),
@@ -88,6 +68,41 @@ class DetailsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
+          Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CustomIconButton(
+                icon: Icon(
+                  Icons.copy,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () async {
+                  await QrServices.copyToClipboard(qr);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Qr Copied to clipboard");
+                },
+              ),
+              if (qr.canOpen)
+                CustomIconButton(
+                  icon: Icon(
+                    Icons.launch,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                  onPressed: () async {
+                    await QrServices.launch(qr);
+                  },
+                ),
+              CustomIconButton(
+                icon: Icon(
+                  Icons.share,
+                  color: theme.colorScheme.onPrimary,
+                ),
+                onPressed: () async {
+                  await QrServices.shareQrText(qr);
+                },
+              ),
+            ],
+          ),
           Container(
             decoration: BoxDecoration(
               border: Border.all(
