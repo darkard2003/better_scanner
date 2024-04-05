@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/details': (context) => const DetailsScreen(),
         '/generator': (context) => const QrGeneratorScreen(),
+        '/scanner': (context) => const ScannerScreen(),
       },
       home: BlocProvider<ScannerBloc>(
         create: (context) => ScannerBloc(),

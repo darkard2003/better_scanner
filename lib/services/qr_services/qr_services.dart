@@ -1,17 +1,20 @@
-import 'dart:ui';
+import 'dart:typed_data';
 
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:flutter/services.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:image/image.dart';
 
 class QrServices {
-  static Future<void> copyToClipboard(QrRecordModel qr) async {
+  static Future<void> copyQrToClipboard(QrRecordModel qr) async {
     var data = ClipboardData(text: qr.copyData);
+    await Clipboard.setData(data);
+  }
+
+  static Future<void> copyTextToClipboard(String text) async {
+    var data = ClipboardData(text: text);
     await Clipboard.setData(data);
   }
 
@@ -30,22 +33,14 @@ class QrServices {
     }
   }
 
-  static Future<void> shareQrImage(QrRecordModel qr,
-      {PrettyQrDecoration? decoration}) async {
-    var qrCode = QrCode.fromData(
-        data: qr.data, errorCorrectLevel: QrErrorCorrectLevel.H);
-
-    var qrImage = QrImage(qrCode);
-    var image = await qrImage.toImage(size: 800);
-    var bytes = await image.toByteData(format: ImageByteFormat.png);
-    if (bytes == null) {
-      return;
-    }
-    var byteBuffer = bytes.buffer;
-    var paddedImage = Image.fromBytes(
-        width: image.width + 40, height: image.height + 40, bytes: byteBuffer);
-    var xfile = XFile.fromData(paddedImage.getBytes());
-    await Share.shareXFiles([xfile], text: qr.displayName);
+  static Future<void> shareImage(ByteBuffer bytes, String name,
+      {String mimeType = 'image/png'}) {
+    var xfile = XFile.fromData(
+      bytes.asUint8List(),
+      mimeType: mimeType,
+      name: name,
+    );
+    return Share.shareXFiles([xfile], text: name);
   }
 
   static Future<void> shareQrText(QrRecordModel qr) async {

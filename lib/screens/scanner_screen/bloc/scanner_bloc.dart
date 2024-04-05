@@ -5,6 +5,7 @@ import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/state_message.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
+import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -109,9 +110,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     );
   }
 
-  void _onShare(ScannerEventShare event, Emitter<ScannerState> emit) {
+  void _onShare(ScannerEventShare event, Emitter<ScannerState> emit) async {
     var record = event.record;
-    Share.share(record.data, subject: record.name);
+    await QrServices.shareQrText(record);
   }
 
   void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
@@ -126,7 +127,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   }
 
   void _openUrl(ScannerEventOpenUrl event, Emitter<ScannerState> emit) async {
-    if (event.record is! UrlQrModel) {
+    if (!event.record.canOpen) {
       emit(
         state.copyWith(
           msg: StateMessage(
@@ -137,7 +138,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       );
     }
     var record = event.record as UrlQrModel;
-    if (!await canLaunchUrl(record.url)) {
+    if (!await QrServices.canLaunch(record)) {
       emit(
         state.copyWith(
           msg: StateMessage(
@@ -147,6 +148,6 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         ),
       );
     }
-    await launchUrl(record.url);
+    await QrServices.launch(record);
   }
 }

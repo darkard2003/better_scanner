@@ -1,9 +1,14 @@
+import 'dart:ui';
+
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/qr_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/qr_generator_vm.dart';
+import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
@@ -18,6 +23,7 @@ class QrGeneratorView extends StatelessWidget {
       data: state.qrRecord.data,
       errorCorrectLevel: QrErrorCorrectLevel.H,
     );
+    var key = GlobalKey();
     var qrImage = QrImage(qrCode);
     // ignore: non_const_call_to_literal_constructor
     var theme = Theme.of(context);
@@ -31,15 +37,18 @@ class QrGeneratorView extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.all(16),
-            child: PrettyQrView(
-              qrImage: qrImage,
+          RepaintBoundary(
+            key: key,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
+              child: PrettyQrView(
+                qrImage: qrImage,
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -59,7 +68,18 @@ class QrGeneratorView extends StatelessWidget {
                   Icons.share,
                   color: theme.colorScheme.onPrimary,
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  var boundary = key.currentContext!.findRenderObject()
+                      as RenderRepaintBoundary;
+                  var image = await boundary.toImage();
+                  var pngBytes =
+                      await image.toByteData(format: ImageByteFormat.png);
+                  if (pngBytes == null) {
+                    return;
+                  }
+                  QrServices.shareImage(
+                      pngBytes.buffer, state.qrRecord.displayName);
+                },
               ),
             ],
           ),
