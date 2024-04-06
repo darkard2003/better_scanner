@@ -1,6 +1,8 @@
+import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_box.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/shareable_qr_preview.dart';
+import 'package:better_scanner/screens/details_screen/wifi_details_field.dart';
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
@@ -17,15 +19,6 @@ class DetailsScreen extends StatelessWidget {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     var qr = args['qr'] as QrRecordModel;
 
-    var size = MediaQuery.of(context).size;
-
-    var qrCode = QrCode.fromData(
-      data: qr.data,
-      errorCorrectLevel: QrErrorCorrectLevel.H,
-    );
-
-    var qrImage = QrImage(qrCode);
-
     var theme = Theme.of(context);
 
     return Scaffold(
@@ -36,7 +29,7 @@ class DetailsScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: SharableQrPreview(
                 qr: qr,
                 onShare: (bytes) async {
@@ -84,6 +77,10 @@ class DetailsScreen extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
+          if (qr.runtimeType == WifiCred) ...[
+            WifiDetailsField(wifi: qr as WifiCred),
+            const SizedBox(height: 20),
+          ],
           CopyTextBox(
             text: qr.data,
             onCopy: () async {
