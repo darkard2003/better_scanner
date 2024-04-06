@@ -3,7 +3,10 @@ import 'dart:typed_data';
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/models/qr_type_extention.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -52,4 +55,47 @@ class QrServices {
     await Share.share(qr.copyData, subject: qr.displayName);
   }
 
+  static List<QrRecordModel> barcodeToQrList(BarcodeCapture barcode) {
+    var qrList = <QrRecordModel>[];
+    var codes = barcode.barcodes;
+    for (var code in codes) {
+      var rawValue = code.rawValue;
+      if (rawValue == null) {
+        continue;
+      }
+      var record =
+          QrRecordModel.newEmpty(data: rawValue, type: code.type.qrType);
+      qrList.add(record);
+    }
+    return qrList;
+  }
+
+  static Future<List<QrRecordModel>> qrFromImage() async {
+    var controller = MobileScannerController();
+    var qrList = <QrRecordModel>[];
+    var pfiles = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowCompression: true,
+    );
+
+    if (pfiles == null) {
+      return qrList;
+    }
+
+    for (var pfile in pfiles.files) {
+      if (pfile.path == null) {
+        continue;
+      }
+      var hasBarcode = await controller.analyzeImage(pfile.path!);
+      if (!hasBarcode) {
+        return qrList;
+      }
+      var barcodeStram = controller.barcodes;
+      var barcodes = await barcodeStram.toList();
+      for (var barcode in barcodes) {
+        qrList.addAll(barcodeToQrList(barcode));
+      }
+    }
+    return qrList;
+  }
 }

@@ -41,7 +41,7 @@ dependencies:
   mobile_scanner: ^4.0.0
   uuid: ^4.2.2
   hive_flutter: ^1.1.0
-  share_plus: ^7.2.1
+  share_plus: ^8.0.2
   url_launcher: ^6.2.4
   flutter_slidable: ^3.0.1
   flutter_xlider: ^3.5.0

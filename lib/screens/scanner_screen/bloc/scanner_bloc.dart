@@ -9,8 +9,6 @@ import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';

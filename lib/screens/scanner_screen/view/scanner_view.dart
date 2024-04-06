@@ -1,6 +1,7 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
+import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -191,7 +192,6 @@ class HistoryView extends StatelessWidget {
           snap: true,
           leading: const Icon(Icons.history),
           actions: [
-            const Icon(Icons.search),
             IconButton(
               icon: const Icon(Icons.qr_code),
               onPressed: () async {
@@ -203,6 +203,17 @@ class HistoryView extends StatelessWidget {
                     .add(ScannerEventScan(record as QrRecordModel));
               },
             ),
+            IconButton(
+                icon: const Icon(Icons.add_a_photo),
+                onPressed: () async {
+                  var qrCodes = await QrServices.qrFromImage();
+                  if (!context.mounted) return;
+                  for (var qr in qrCodes) {
+                    BlocProvider.of<ScannerBloc>(context)
+                        .add(ScannerEventScan(qr));
+                  }
+                }),
+            const Icon(Icons.search),
           ],
           backgroundColor: Colors.transparent,
           centerTitle: true,
