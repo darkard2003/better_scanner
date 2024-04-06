@@ -8,7 +8,6 @@ import 'package:better_scanner/screens/qr_generator_screen/qr_generator_vm.dart'
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
@@ -20,7 +19,7 @@ class QrGeneratorView extends StatelessWidget {
     var vm = context.watch<QrGeneratorVM>();
     var state = vm.state;
     var qrCode = QrCode.fromData(
-      data: state.qrRecord.data,
+      data: vm.state.qrString,
       errorCorrectLevel: QrErrorCorrectLevel.H,
     );
     var key = GlobalKey();
@@ -78,7 +77,9 @@ class QrGeneratorView extends StatelessWidget {
                     return;
                   }
                   QrServices.shareImage(
-                      pngBytes.buffer, state.qrRecord.displayName);
+                    pngBytes.buffer,
+                    vm.qr.displayName,
+                  );
                 },
               ),
             ],
@@ -110,7 +111,7 @@ class QrGeneratorView extends StatelessWidget {
             onChanged: vm.updateName,
           ),
           const SizedBox(height: 8),
-          QrGenerator(type: state.type, onGenerate: vm.updateQrRecord),
+          QrGeneratorField(type: state.type, onGenerate: vm.updateQrRecord),
         ],
       ),
     );

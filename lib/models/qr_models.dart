@@ -55,22 +55,13 @@ class WifiCred extends QrRecordModel {
   @override
   String get copyData => password;
 
-  factory WifiCred.fromSSIDPassword(
+  static String getWifiQrString(
     String ssid,
     String password, {
     WifiSecurity security = WifiSecurity.WPA,
     bool hidden = false,
   }) {
-    var id = const Uuid().v4().toString();
-    var createdAt = DateTime.now();
-    var data = "WIFI:T:${security.name};S:$ssid;P:$password;H:${hidden ? 'true': ''};;";
-    return WifiCred(
-      id: id,
-      name: '',
-      data: data,
-      type: QrType.wifi,
-      createdAt: createdAt,
-    );
+    return "WIFI:T:${security.name};S:$ssid;P:$password;H:${hidden ? 'true' : ''};;";
   }
 }
 

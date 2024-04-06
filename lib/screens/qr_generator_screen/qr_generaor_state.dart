@@ -1,21 +1,27 @@
-import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 
 class QRGeneratorState {
-  final QrRecordModel qrRecord;
+  final String uuid;
+  final String name;
+  final String qrString;
   final QrType type;
 
   const QRGeneratorState({
-    required this.qrRecord,
+    required this.uuid,
+    required this.name,
+    required this.qrString,
     required this.type,
   });
 
   QRGeneratorState copyWith({
-    QrRecordModel? qrRecord,
+    String? name,
+    String? qrString,
     QrType? type,
   }) {
     return QRGeneratorState(
-      qrRecord: qrRecord ?? this.qrRecord,
+      uuid: uuid,
+      name: name ?? this.name,
+      qrString: qrString ?? this.qrString,
       type: type ?? this.type,
     );
   }

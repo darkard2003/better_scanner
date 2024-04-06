@@ -1,30 +1,22 @@
-import 'package:better_scanner/models/qr_record_model.dart';
+import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:flutter/material.dart';
 
-class TextQrGenerator extends StatefulWidget {
-  final Function(QrRecordModel) onQrGenerated;
-  const TextQrGenerator({super.key, required this.onQrGenerated});
-
-  @override
-  State<TextQrGenerator> createState() => _TextQrGeneratorState();
-}
-
-class _TextQrGeneratorState extends State<TextQrGenerator> {
-  QrRecordModel _qrRecord = QrRecordModel.fromText('');
+class TextQrGenerator extends StatelessWidget {
+  final QrType type;
+  final Function(String) onQrGenerated;
+  const TextQrGenerator({
+    super.key,
+    required this.onQrGenerated,
+    required this.type,
+  });
 
   @override
   Widget build(BuildContext context) {
     return DecoratedTextField(
-      hintText: 'Enter Text',
-      labelText: 'Text',
-      onChanged: (text) {
-        setState(() {
-          _qrRecord = QrRecordModel.fromText(text);
-          widget.onQrGenerated(_qrRecord);
-        });
-      },
+      hintText: 'Enter ${type.name} here',
+      labelText: type.name,
+      onChanged: (text) => onQrGenerated(text),
     );
   }
 }
-

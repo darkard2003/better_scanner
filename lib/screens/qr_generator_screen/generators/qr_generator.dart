@@ -1,13 +1,12 @@
-import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/plain_text.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/wifi_qr.dart';
 import 'package:flutter/material.dart';
 
-class QrGenerator extends StatelessWidget {
+class QrGeneratorField extends StatelessWidget {
   final QrType type;
-  final Function(QrRecordModel) onGenerate;
-  const QrGenerator({
+  final Function(String) onGenerate;
+  const QrGeneratorField({
     super.key,
     required this.type,
     required this.onGenerate,
@@ -19,7 +18,7 @@ class QrGenerator extends StatelessWidget {
       case QrType.wifi:
         return WifiQrGenerator(onQrGenerated: onGenerate);
       default:
-        return TextQrGenerator(onQrGenerated: onGenerate);
+        return TextQrGenerator(onQrGenerated: onGenerate, type: type);
     }
   }
 }

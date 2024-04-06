@@ -1,11 +1,10 @@
 import 'package:better_scanner/models/qr_models.dart';
-import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/wifi_security.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:flutter/material.dart';
 
 class WifiQrGenerator extends StatefulWidget {
-  final Function(QrRecordModel) onQrGenerated;
+  final Function(String) onQrGenerated;
   const WifiQrGenerator({super.key, required this.onQrGenerated});
 
   @override
@@ -13,7 +12,8 @@ class WifiQrGenerator extends StatefulWidget {
 }
 
 class _WifiQrGeneratorState extends State<WifiQrGenerator> {
-  WifiCred _qrRecord = WifiCred.fromSSIDPassword('', '');
+  String _ssid = '';
+  String _password = '';
   WifiSecurity _selectedSecurity = WifiSecurity.WPA;
   bool _hidden = false;
   bool _showPassword = false;
@@ -29,26 +29,23 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
               child: Row(
                 children: WifiSecurity.values
                     .map((s) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
                             label: Text(s.name),
                             selected: _selectedSecurity == s,
                             onSelected: (selected) {
                               if (selected) {
-                                setState(() {
-                                  _selectedSecurity = s;
-                                  _qrRecord = WifiCred.fromSSIDPassword(
-                                    _qrRecord.ssid,
-                                    _qrRecord.password,
-                                    hidden: _hidden,
-                                    security: s,
-                                  );
-                                  widget.onQrGenerated(_qrRecord);
-                                });
+                                _selectedSecurity = s;
+                                var qrString = WifiCred.getWifiQrString(
+                                    _ssid, _password,
+                                    security: _selectedSecurity,
+                                    hidden: _hidden);
+                                widget.onQrGenerated(qrString);
+                                setState(() {});
                               }
                             },
                           ),
-                    ))
+                        ))
                     .toList(),
               ),
             ),
@@ -56,16 +53,11 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
             Checkbox(
               value: _hidden,
               onChanged: (value) {
-                setState(() {
-                  _hidden = value!;
-                  _qrRecord = WifiCred.fromSSIDPassword(
-                    _qrRecord.ssid,
-                    _qrRecord.password,
-                    security: _selectedSecurity,
-                    hidden: _hidden,
-                  );
-                  widget.onQrGenerated(_qrRecord);
-                });
+                _hidden = value!;
+                var qrString = WifiCred.getWifiQrString(_ssid, _password,
+                    security: _selectedSecurity, hidden: _hidden);
+                widget.onQrGenerated(qrString);
+                setState(() {});
               },
             ),
           ],
@@ -75,10 +67,11 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter SSID',
           labelText: 'SSID',
           onChanged: (text) {
-            setState(() {
-              _qrRecord = WifiCred.fromSSIDPassword(text, _qrRecord.password);
-              widget.onQrGenerated(_qrRecord);
-            });
+            _ssid = text;
+            var qrString = WifiCred.getWifiQrString(_ssid, _password,
+                security: _selectedSecurity, hidden: _hidden);
+            widget.onQrGenerated(qrString);
+            setState(() {});
           },
         ),
         const SizedBox(height: 8.0),
@@ -86,10 +79,11 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter Password',
           labelText: 'Password',
           onChanged: (text) {
-            setState(() {
-              _qrRecord = WifiCred.fromSSIDPassword(_qrRecord.ssid, text);
-              widget.onQrGenerated(_qrRecord);
-            });
+            _password = text;
+            var qrString = WifiCred.getWifiQrString(_ssid, _password,
+                security: _selectedSecurity, hidden: _hidden);
+            widget.onQrGenerated(qrString);
+            setState(() {});
           },
           obscureText: !_showPassword,
           suffix: IconButton(
