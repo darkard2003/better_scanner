@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 
 class CopyTextField extends StatelessWidget {
-final String title;
+  final String title;
   final String text;
+  final Widget? trailing;
+  final bool obscureText;
   final Function()? onCopy;
   const CopyTextField({
     super.key,
     required this.title,
     required this.text,
     this.onCopy,
+    this.trailing,
+    this.obscureText = false,
   });
 
   @override
@@ -20,19 +24,23 @@ final String title;
         ),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Row(
-        children: [
-          Text('$title: '),
-          Expanded(
-            child: Text(text),
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.copy,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Row(
+          children: [
+            Text('$title: '),
+            Expanded(
+              child: Text(obscureText ? "*" * text.length : text,),
             ),
-            onPressed: onCopy,
-          ),
-        ],
+            if(trailing != null) trailing!,
+            IconButton(
+              icon: const Icon(
+                Icons.copy,
+              ),
+              onPressed: onCopy,
+            ),
+          ],
+        ),
       ),
     );
   }

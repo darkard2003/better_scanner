@@ -51,4 +51,5 @@ class QrServices {
     }
     await Share.share(qr.copyData, subject: qr.displayName);
   }
+
 }

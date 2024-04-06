@@ -78,7 +78,19 @@ class DetailsScreen extends StatelessWidget {
             height: 20,
           ),
           if (qr.runtimeType == WifiCred) ...[
-            WifiDetailsField(wifi: qr as WifiCred),
+            WifiDetailsField(
+              wifi: qr as WifiCred,
+              onCopySsid: () async {
+                await QrServices.copyTextToClipboard(qr.ssid);
+                if(!context.mounted) return;
+                showSnackbar(context, "SSID copied to clipbard");
+              },
+              onCopyPassword: () async {
+                await QrServices.copyTextToClipboard(qr.password);
+                if(!context.mounted) return;
+                showSnackbar(context, "Password copied to clipbard");
+              },
+            ),
             const SizedBox(height: 20),
           ],
           CopyTextBox(
