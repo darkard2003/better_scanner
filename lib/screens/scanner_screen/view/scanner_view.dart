@@ -213,10 +213,13 @@ class HistoryView extends StatelessWidget {
                         .add(ScannerEventScan(qr));
                   }
                 }),
-            const Icon(Icons.search),
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {},
+            ),
           ],
           backgroundColor: Colors.transparent,
-          centerTitle: true,
+          // centerTitle: true,
         ),
         RecordListViewSliver(
           records: state.qrCodes,

@@ -81,6 +81,26 @@ class QrServices {
     if (pfiles == null) {
       return qrList;
     }
+    bool canReturn = false;
+
+    controller.barcodes.listen((event) {
+      var coes = event.barcodes;
+      if (coes.isEmpty) {
+        return;
+      }
+
+      for (var code in coes) {
+        var rawValue = code.rawValue;
+        if (rawValue == null) {
+          continue;
+        }
+        var record =
+            QrRecordModel.newEmpty(data: rawValue, type: code.type.qrType);
+        qrList.add(record);
+      }
+
+      canReturn = true;
+    });
 
     for (var pfile in pfiles.files) {
       if (pfile.path == null) {
@@ -90,11 +110,10 @@ class QrServices {
       if (!hasBarcode) {
         return qrList;
       }
-      var barcodeStram = controller.barcodes;
-      var barcodes = await barcodeStram.toList();
-      for (var barcode in barcodes) {
-        qrList.addAll(barcodeToQrList(barcode));
-      }
+    }
+
+    while (!canReturn) {
+      await Future.delayed(const Duration(milliseconds: 100));
     }
     return qrList;
   }
