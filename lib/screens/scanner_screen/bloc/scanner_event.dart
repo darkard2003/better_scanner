@@ -24,8 +24,7 @@ class ScannerEventUpdate extends ScannerEvent {
 
 class ScannerEventOnTap extends ScannerEvent {
   final QrRecordModel record;
-  final BuildContext context;
-  const ScannerEventOnTap(this.record, this.context);
+  const ScannerEventOnTap(this.record);
 }
 
 class ScannerEventOnLongPress extends ScannerEvent {
@@ -33,10 +32,9 @@ class ScannerEventOnLongPress extends ScannerEvent {
   const ScannerEventOnLongPress(this.record);
 }
 
-class ScannerEventRename extends ScannerEvent {
+class ScannerEventEdit extends ScannerEvent {
   final QrRecordModel record;
-  final String name;
-  const ScannerEventRename(this.record, this.name);
+  const ScannerEventEdit(this.record);
 }
 
 class ScannerEventShare extends ScannerEvent {

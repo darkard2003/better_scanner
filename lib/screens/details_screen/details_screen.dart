@@ -6,7 +6,6 @@ import 'package:better_scanner/screens/details_screen/wifi_details_field.dart';
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
-import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../models/qr_record_model.dart';
 

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
+import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -16,28 +20,63 @@ class ScannerView extends StatefulWidget {
   State<ScannerView> createState() => _ScannerViewState();
 }
 
-class _ScannerViewState extends State<ScannerView> {
-  late MobileScannerController _controller;
+class _ScannerViewState extends State<ScannerView> with WidgetsBindingObserver {
+  late final MobileScannerController _controller;
+  StreamSubscription<Object?>? _subscription;
   bool _cameraEnabled = true;
 
-  // void loadFile() async {
-  //   var fileResult = await FilePicker.platform.pickFiles();
-  //   if (fileResult == null) return;
-  //   File file = File(fileResult.files.single.path!);
+  void _handleBarcode(BarcodeCapture record) {
+    var qrCodes = QrServices.barcodeToQrList(record);
+    for (var code in qrCodes) {
+      BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(code));
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _subscription = _controller.barcodes.listen(_handleBarcode);
+        unawaited(_controller.start());
+        break;
+      case AppLifecycleState.inactive:
+        unawaited(_subscription?.cancel());
+        _subscription = null;
+        unawaited(_controller.stop());
+      default:
+        return;
+    }
+  }
+
+  // @override
+  // Future<void> didChangeDependencies() async {
+  //   await _controller.stop();
+  //   super.didChangeDependencies();
+  //   _subscription = _controller.barcodes.listen(_handleBarcode);
+  //   await _controller.start();
   // }
 
   @override
   void initState() {
     super.initState();
-    _controller = MobileScannerController(
-      facing: CameraFacing.back,
-      detectionSpeed: DetectionSpeed.noDuplicates,
-    );
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    _controller = context.read<ScannerBloc>().controller;
+    WidgetsBinding.instance.addObserver(this);
+    _subscription = _controller.barcodes.listen(_handleBarcode);
+    unawaited(_controller.start());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_subscription?.cancel());
+    super.dispose();
+    _controller.dispose();
   }
 
   List<Widget> _buildActions() {
     return [
-      // Camera enable/disable
       IconButton(
         icon: Icon(
           _cameraEnabled ? Icons.camera_alt : Icons.camera_alt_outlined,
@@ -48,7 +87,6 @@ class _ScannerViewState extends State<ScannerView> {
           setState(() {});
         },
       ),
-      // Flash enable/disable
       ValueListenableBuilder(
         valueListenable: _controller.torchState,
         builder: (context, value, widget) {
@@ -67,7 +105,6 @@ class _ScannerViewState extends State<ScannerView> {
           );
         },
       ),
-
       ValueListenableBuilder(
           valueListenable: _controller.cameraFacingState,
           builder: (context, value, widget) {
@@ -111,6 +148,7 @@ class _ScannerViewState extends State<ScannerView> {
                 height: constraints.maxHeight * 0.5,
                 child: HistoryView(
                   state: widget.state,
+                  controller: _controller,
                 ),
               ),
             ],
@@ -121,6 +159,7 @@ class _ScannerViewState extends State<ScannerView> {
           children: [
             const SizedBox(width: 10),
             ScanView(
+              controller: _controller,
               dimentions: constraints.maxWidth * 0.4 - 60,
               // controller: widget.state.controller,
             ),
@@ -133,7 +172,10 @@ class _ScannerViewState extends State<ScannerView> {
             ),
             SizedBox(
               width: constraints.maxWidth * 0.5,
-              child: HistoryView(state: widget.state),
+              child: HistoryView(
+                state: widget.state,
+                controller: _controller,
+              ),
             ),
           ],
         );
@@ -143,12 +185,12 @@ class _ScannerViewState extends State<ScannerView> {
 }
 
 class ScanView extends StatelessWidget {
-  final MobileScannerController? controller;
+  final MobileScannerController controller;
 
   final double dimentions;
   const ScanView({
     super.key,
-    this.controller,
+    required this.controller,
     required this.dimentions,
   });
 
@@ -157,17 +199,16 @@ class ScanView extends StatelessWidget {
     return ScanWindow(
       controller: controller,
       size: dimentions,
-      onDetect: (record) {
-        BlocProvider.of<ScannerBloc>(context).add(ScannerEventScan(record));
-      },
     );
   }
 }
 
 class HistoryView extends StatelessWidget {
+  final MobileScannerController controller;
   const HistoryView({
     super.key,
     required this.state,
+    required this.controller,
   });
 
   final ScannerScreenState state;
@@ -195,8 +236,10 @@ class HistoryView extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.qr_code),
               onPressed: () async {
+                unawaited(controller.stop());
                 var record =
                     await Navigator.of(context).pushNamed('/generator');
+                unawaited(controller.start());
                 if (record == null) return;
                 if (!context.mounted) return;
                 BlocProvider.of<ScannerBloc>(context)
@@ -206,12 +249,9 @@ class HistoryView extends StatelessWidget {
             IconButton(
                 icon: const Icon(Icons.add_a_photo),
                 onPressed: () async {
-                  var qrCodes = await QrServices.qrFromImage();
+                  var scanned = await QrServices.scanQrFromFile(controller);
                   if (!context.mounted) return;
-                  for (var qr in qrCodes) {
-                    BlocProvider.of<ScannerBloc>(context)
-                        .add(ScannerEventScan(qr));
-                  }
+                  if (!scanned) showSnackbar(context, "Faild to Scan QR");
                 }),
             IconButton(
               icon: const Icon(Icons.search),

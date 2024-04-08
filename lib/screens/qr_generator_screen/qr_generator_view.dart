@@ -78,7 +78,7 @@ class QrGeneratorView extends StatelessWidget {
                   }
                   QrServices.shareImage(
                     pngBytes.buffer,
-                    vm.qr.displayName,
+                    vm.qrIn.displayName,
                   );
                 },
               ),

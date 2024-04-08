@@ -1,63 +1,19 @@
-import 'package:better_scanner/models/qr_record_model.dart';
-import 'package:better_scanner/models/qr_type.dart';
-import 'package:better_scanner/models/qr_type_extention.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-class ScanWindow extends StatefulWidget {
-  final Function(QrRecordModel record) onDetect;
+class ScanWindow extends StatelessWidget {
   final double size;
-  final MobileScannerController? controller;
+  final MobileScannerController controller;
   const ScanWindow({
     super.key,
-    required this.onDetect,
+    required this.controller,
     this.size = 300,
-    this.controller,
   });
-
-  @override
-  State<ScanWindow> createState() => _ScanWindowState();
-}
-
-class _ScanWindowState extends State<ScanWindow> {
-  late MobileScannerController _controller;
-  void translate(BarcodeCapture capture, BuildContext context) {
-    var codes = capture.barcodes;
-    for (var code in codes) {
-      var rawValue = code.rawValue;
-      if (rawValue == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Unknown QR code'),
-          ),
-        );
-        return;
-      }
-      var record =
-          QrRecordModel.newEmpty(data: rawValue, type: code.type.qrType);
-      widget.onDetect(record);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = widget.controller ??
-        MobileScannerController(
-          detectionSpeed: DetectionSpeed.noDuplicates,
-        );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox.square(
-      dimension: widget.size,
+      dimension: size,
       child: Card(
         elevation: 10,
         child: ClipRRect(
@@ -65,10 +21,8 @@ class _ScanWindowState extends State<ScanWindow> {
           child: Stack(
             children: [
               MobileScanner(
-                // controller: widget.controller,
-                // startDelay: true,
-                controller: _controller,
-                onDetect: (capture) => translate(capture, context),
+                controller: controller,
+                onDetect: (record) {},
               ),
             ],
           ),
@@ -100,4 +54,3 @@ Iterable<Widget> buildActions(
     },
   );
 }
-

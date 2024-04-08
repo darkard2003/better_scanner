@@ -5,9 +5,7 @@ import 'package:better_scanner/screens/scanner_screen/scanner_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -30,7 +28,7 @@ class MyApp extends StatelessWidget {
         '/scanner': (context) => const ScannerScreen(),
       },
       home: BlocProvider<ScannerBloc>(
-        create: (context) => ScannerBloc(),
+        create: (context) => ScannerBloc(context),
         child: const ScannerScreen(),
       ),
     );

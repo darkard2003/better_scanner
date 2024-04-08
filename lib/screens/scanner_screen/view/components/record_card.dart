@@ -41,14 +41,6 @@ class RecordCard extends StatelessWidget {
     required this.record,
   });
 
-  void _rename(BuildContext context, QrRecordModel record,
-      ScannerBloc scannerBloc) async {
-    var name = await showRenameDialog(context, record.name);
-    if (name != null) {
-      scannerBloc.add(ScannerEventRename(record, name));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     var scannerBloc = BlocProvider.of<ScannerBloc>(context);
@@ -65,7 +57,7 @@ class RecordCard extends StatelessWidget {
                   onPressed: (context) {
                     switch (action) {
                       case RecordAction.rename:
-                        _rename(context, record, scannerBloc);
+                        scannerBloc.add(ScannerEventEdit(record));
                         break;
                       case RecordAction.delete:
                         scannerBloc.add(ScannerEventDelete(record));
@@ -85,9 +77,7 @@ class RecordCard extends StatelessWidget {
         ),
         child: ListTile(
             leading: Icon(record.type.icon),
-            onTap: () => scannerBloc.add(
-                  ScannerEventOnTap(record, context),
-                ),
+            onTap: () => context.read<ScannerBloc>().add(ScannerEventOnTap(record)),
             title: Text(
               record.name.isEmpty ? record.displayName : record.name,
               maxLines: 1,

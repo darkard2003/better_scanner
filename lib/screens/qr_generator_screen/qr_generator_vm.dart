@@ -7,15 +7,16 @@ import 'package:uuid/uuid.dart';
 
 class QrGeneratorVM extends Cubit<QRGeneratorState> {
   BuildContext context;
+  QrRecordModel? qrIn;
   QrGeneratorVM({
     required this.context,
+    this.qrIn,
   }) : super(QRGeneratorState(
-          uuid: const Uuid().v4().toString(),
-          name: '',
-          qrString: "",
-          type: QrType.text,
+          uuid: qrIn?.id ?? const Uuid().v4(),
+          name: qrIn?.name ?? "",
+          qrString: qrIn?.data ?? "",
+          type: qrIn?.type ?? QrType.text,
         ));
-
 
   void updateQrRecord(String qrString) {
     emit(state.copyWith(qrString: qrString));
@@ -26,7 +27,7 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
   }
 
   void save() {
-    Navigator.of(context).pop(qr);
+    Navigator.of(context).pop(qrIn);
   }
 
   void updateName(String name) {

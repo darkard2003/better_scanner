@@ -70,51 +70,19 @@ class QrServices {
     return qrList;
   }
 
-  static Future<List<QrRecordModel>> qrFromImage() async {
-    var controller = MobileScannerController();
-    var qrList = <QrRecordModel>[];
-    var pfiles = await FilePicker.platform.pickFiles(
+  static Future<bool> scanQrFromFile(MobileScannerController controller) async {
+    var file = await FilePicker.platform.pickFiles(
       type: FileType.image,
-      allowCompression: true,
     );
-
-    if (pfiles == null) {
-      return qrList;
+    if (file == null) {
+      return false;
     }
-    bool canReturn = false;
+    var path = file.files.single.path;
 
-    controller.barcodes.listen((event) {
-      var coes = event.barcodes;
-      if (coes.isEmpty) {
-        return;
-      }
-
-      for (var code in coes) {
-        var rawValue = code.rawValue;
-        if (rawValue == null) {
-          continue;
-        }
-        var record =
-            QrRecordModel.newEmpty(data: rawValue, type: code.type.qrType);
-        qrList.add(record);
-      }
-
-      canReturn = true;
-    });
-
-    for (var pfile in pfiles.files) {
-      if (pfile.path == null) {
-        continue;
-      }
-      var hasBarcode = await controller.analyzeImage(pfile.path!);
-      if (!hasBarcode) {
-        return qrList;
-      }
+    if (path == null) {
+      return false;
     }
 
-    while (!canReturn) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-    return qrList;
+    return await controller.analyzeImage(path);
   }
 }

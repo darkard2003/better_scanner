@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
@@ -9,6 +11,7 @@ import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
@@ -16,11 +19,15 @@ export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   late Database db;
   var records = <QrRecordModel>[];
+  var controller = MobileScannerController();
+  final BuildContext context;
 
-  ScannerBloc() : super(ScannerStateUninitialized()) {
+  ScannerBloc(
+    this.context,
+  ) : super(ScannerStateUninitialized()) {
     on<ScannerEventInit>(_onInit);
     on<ScannerEventScan>(_onScan);
-    on<ScannerEventRename>(_onRename);
+    on<ScannerEventEdit>(_onEdit);
     on<ScannerEventDelete>(_onDelete);
     on<ScannerEventOnTap>(_onTap);
     on<ScannerEventOnLongPress>(_onLongPress);
@@ -85,15 +92,18 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     ));
   }
 
-  void _onRename(ScannerEventRename event, Emitter<ScannerState> emit) async {
-    var record = event.record;
-    var name = record.name;
-    record.name = event.name;
+  void _onEdit(ScannerEventEdit event, Emitter<ScannerState> emit) async {
+    var record = await Navigator.pushNamed(
+      context,
+      '/generate',
+      arguments: {'qr': event.record},
+    ) as QrRecordModel?;
+    if (record == null) return;
     await db.updateRecord(record);
     records = await db.getRecords();
     emit(ScannerScreenState(
       qrCodes: records,
-      msg: StateMessage(message: 'Renamed $name to ${event.name}'),
+      msg: StateMessage(message: 'Updated ${record.name}'),
     ));
   }
 
@@ -115,13 +125,14 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
 
   void _onTap(ScannerEventOnTap event, Emitter<ScannerState> emit) async {
     var record = event.record;
-    var context = event.context;
 
+    unawaited(controller.stop());
     var res = await Navigator.pushNamed(
       context,
       '/details',
       arguments: {'qr': record},
     );
+    unawaited(controller.start());
   }
 
   void _openUrl(ScannerEventOpenUrl event, Emitter<ScannerState> emit) async {
