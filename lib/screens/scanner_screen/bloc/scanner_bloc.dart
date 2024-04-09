@@ -95,7 +95,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   void _onEdit(ScannerEventEdit event, Emitter<ScannerState> emit) async {
     var record = await Navigator.pushNamed(
       context,
-      '/generate',
+      '/generator',
       arguments: {'qr': event.record},
     ) as QrRecordModel?;
     if (record == null) return;

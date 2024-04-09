@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class DecoratedTextField extends StatelessWidget {
   final String hintText;
   final String labelText;
+  final String? initialValue;
   final Function(String) onChanged;
   final double borderRadius;
   final bool obscureText;
@@ -15,6 +16,7 @@ class DecoratedTextField extends StatelessWidget {
     required this.hintText,
     required this.labelText,
     required this.onChanged,
+    this.initialValue,
     this.borderRadius = 8.0,
     this.obscureText = false,
     this.enabled = true,
@@ -22,7 +24,6 @@ class DecoratedTextField extends StatelessWidget {
     this.suffix,
     this.controller,
   });
-
   @override
   Widget build(BuildContext context) {
     return TextField(

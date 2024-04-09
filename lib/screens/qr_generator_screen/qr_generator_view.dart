@@ -78,7 +78,7 @@ class QrGeneratorView extends StatelessWidget {
                   }
                   QrServices.shareImage(
                     pngBytes.buffer,
-                    vm.qrIn.displayName,
+                    vm.qr.displayName,
                   );
                 },
               ),
@@ -106,6 +106,7 @@ class QrGeneratorView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           DecoratedTextField(
+            controller: vm.nameController,
             hintText: 'Enter Name',
             labelText: 'Name',
             onChanged: vm.updateName,

@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 class QrGeneratorVM extends Cubit<QRGeneratorState> {
   BuildContext context;
   QrRecordModel? qrIn;
+  final TextEditingController nameController = TextEditingController();
   QrGeneratorVM({
     required this.context,
     this.qrIn,
@@ -16,7 +17,9 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
           name: qrIn?.name ?? "",
           qrString: qrIn?.data ?? "",
           type: qrIn?.type ?? QrType.text,
-        ));
+        )) {
+    nameController.text = state.name;
+  }
 
   void updateQrRecord(String qrString) {
     emit(state.copyWith(qrString: qrString));
@@ -27,7 +30,7 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
   }
 
   void save() {
-    Navigator.of(context).pop(qrIn);
+    Navigator.of(context).pop(qr);
   }
 
   void updateName(String name) {
