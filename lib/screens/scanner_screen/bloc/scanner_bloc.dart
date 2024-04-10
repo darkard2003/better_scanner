@@ -19,7 +19,9 @@ export 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   late Database db;
   var records = <QrRecordModel>[];
-  var controller = MobileScannerController();
+  var controller = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+  );
   final BuildContext context;
 
   ScannerBloc(
