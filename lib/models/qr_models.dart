@@ -1,7 +1,5 @@
 import 'package:better_scanner/models/qr_record_model.dart';
-import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/models/wifi_security.dart';
-import 'package:uuid/uuid.dart';
 
 class WifiCred extends QrRecordModel {
   late String ssid;
@@ -32,16 +30,16 @@ class WifiCred extends QrRecordModel {
     }
     switch (securityString.toUpperCase()) {
       case 'wep':
-        security = WifiSecurity.WEP;
+        security = WifiSecurity.wep;
         break;
       case 'wpa':
-        security = WifiSecurity.WPA;
+        security = WifiSecurity.wpa;
         break;
       case 'nopass':
-        security = WifiSecurity.None;
+        security = WifiSecurity.none;
         break;
       default:
-        security = WifiSecurity.None;
+        security = WifiSecurity.none;
         break;
     }
   }
@@ -58,7 +56,7 @@ class WifiCred extends QrRecordModel {
   static String getWifiQrString(
     String ssid,
     String password, {
-    WifiSecurity security = WifiSecurity.WPA,
+    WifiSecurity security = WifiSecurity.wpa,
     bool hidden = false,
   }) {
     return "WIFI:T:${security.name};S:$ssid;P:$password;H:${hidden ? 'true' : ''};;";

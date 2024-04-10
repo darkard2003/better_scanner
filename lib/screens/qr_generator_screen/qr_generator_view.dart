@@ -26,9 +26,9 @@ class QrGeneratorView extends StatelessWidget {
     var qrImage = QrImage(qrCode);
     // ignore: non_const_call_to_literal_constructor
     var theme = Theme.of(context);
-    var qrDecoration = PrettyQrDecoration(
-      background: theme.colorScheme.onSurface,
-    );
+    // var qrDecoration = PrettyQrDecoration(
+    //   background: theme.colorScheme.onSurface,
+    // );
     return Scaffold(
       appBar: AppBar(
         title: const Text('QR Generator'),

@@ -1,17 +1,17 @@
 enum WifiSecurity {
-  WPA,
-  WEP,
-  None,
+  wpa,
+  wep,
+  none,
 }
 
 extension WifiSecurityExtension on WifiSecurity {
   String get value {
     switch (this) {
-      case WifiSecurity.WPA:
+      case WifiSecurity.wpa:
         return 'WPA/WPA2';
-      case WifiSecurity.WEP:
+      case WifiSecurity.wep:
         return 'WEP';
-      case WifiSecurity.None:
+      case WifiSecurity.none:
         return '';
     }
   }
@@ -19,11 +19,11 @@ extension WifiSecurityExtension on WifiSecurity {
   static WifiSecurity fromString(String value) {
     switch (value) {
       case 'WPA/WPA2':
-        return WifiSecurity.WPA;
+        return WifiSecurity.wpa;
       case 'WEP':
-        return WifiSecurity.WEP;
+        return WifiSecurity.wep;
       default:
-        return WifiSecurity.None;
+        return WifiSecurity.none;
     }
   }
 }

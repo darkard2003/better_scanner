@@ -1,6 +1,5 @@
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_field.dart';
-import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 
 class WifiDetailsField extends StatefulWidget {

@@ -14,7 +14,7 @@ class WifiQrGenerator extends StatefulWidget {
 class _WifiQrGeneratorState extends State<WifiQrGenerator> {
   String _ssid = '';
   String _password = '';
-  WifiSecurity _selectedSecurity = WifiSecurity.WPA;
+  WifiSecurity _selectedSecurity = WifiSecurity.wpa;
   bool _hidden = false;
   bool _showPassword = false;
 

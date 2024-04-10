@@ -1,5 +1,4 @@
 import 'package:better_scanner/models/qr_record_model.dart';
-import 'package:flutter/widgets.dart';
 
 abstract class ScannerEvent {
   const ScannerEvent();

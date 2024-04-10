@@ -1,7 +1,6 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
-import 'package:better_scanner/screens/scanner_screen/view/components/rename_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';

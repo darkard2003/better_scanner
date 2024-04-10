@@ -127,7 +127,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     var record = event.record;
 
     unawaited(controller.stop());
-    var res = await Navigator.pushNamed(
+    var _ = await Navigator.pushNamed(
       context,
       '/details',
       arguments: {'qr': record},
