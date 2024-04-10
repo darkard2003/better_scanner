@@ -60,7 +60,7 @@ class QrRecordModel {
           createdAt: createdAt,
         );
       case QrType.geo:
-        return GeoLocation(
+        return GeoLocationQr(
           id: id,
           name: name,
           data: data,

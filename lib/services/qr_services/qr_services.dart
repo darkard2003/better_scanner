@@ -25,6 +25,8 @@ class QrServices {
     if (qr.type == QrType.url) {
       qr = qr as UrlQrModel;
       return await canLaunchUrl(qr.url);
+    } else if (qr.type == QrType.geo) {
+      return true;
     }
     return false;
   }
@@ -33,6 +35,11 @@ class QrServices {
     if (qr.type == QrType.url) {
       qr = qr as UrlQrModel;
       await launchUrl(qr.url);
+    } else if (qr.type == QrType.geo) {
+      var geo = qr as GeoLocationQr;
+      var url = geo.toGoogleMapsUrl();
+      var uri = Uri.parse(url);
+      await launchUrl(uri);
     }
   }
 

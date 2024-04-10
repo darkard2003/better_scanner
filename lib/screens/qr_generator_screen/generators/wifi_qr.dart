@@ -5,18 +5,32 @@ import 'package:flutter/material.dart';
 
 class WifiQrGenerator extends StatefulWidget {
   final Function(String) onQrGenerated;
-  const WifiQrGenerator({super.key, required this.onQrGenerated});
+  final WifiCred wifiQr;
+  const WifiQrGenerator({
+    super.key,
+    required this.onQrGenerated,
+    required this.wifiQr,
+  });
 
   @override
   State<WifiQrGenerator> createState() => _WifiQrGeneratorState();
 }
 
 class _WifiQrGeneratorState extends State<WifiQrGenerator> {
-  String _ssid = '';
-  String _password = '';
-  WifiSecurity _selectedSecurity = WifiSecurity.wpa;
-  bool _hidden = false;
+  late TextEditingController ssidController;
+  late TextEditingController passwordController;
+  late WifiSecurity selectedSecurity;
+  late bool hidden;
   bool _showPassword = false;
+
+  @override
+  void initState() {
+    super.initState();
+    ssidController = TextEditingController(text: widget.wifiQr.ssid);
+    passwordController = TextEditingController(text: widget.wifiQr.password);
+    selectedSecurity = widget.wifiQr.security;
+    hidden = widget.wifiQr.hidden;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,14 +46,15 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
                           padding: const EdgeInsets.only(right: 8),
                           child: ChoiceChip(
                             label: Text(s.name),
-                            selected: _selectedSecurity == s,
+                            selected: selectedSecurity == s,
                             onSelected: (selected) {
                               if (selected) {
-                                _selectedSecurity = s;
+                                selectedSecurity = s;
                                 var qrString = WifiCred.getWifiQrString(
-                                    _ssid, _password,
-                                    security: _selectedSecurity,
-                                    hidden: _hidden);
+                                    ssidController.text,
+                                    passwordController.text,
+                                    security: selectedSecurity,
+                                    hidden: hidden);
                                 widget.onQrGenerated(qrString);
                                 setState(() {});
                               }
@@ -51,11 +66,15 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
             ),
             const Text('Hidden'),
             Checkbox(
-              value: _hidden,
+              value: hidden,
               onChanged: (value) {
-                _hidden = value!;
-                var qrString = WifiCred.getWifiQrString(_ssid, _password,
-                    security: _selectedSecurity, hidden: _hidden);
+                hidden = value!;
+                var qrString = WifiCred.getWifiQrString(
+                  ssidController.text,
+                  passwordController.text,
+                  security: selectedSecurity,
+                  hidden: hidden,
+                );
                 widget.onQrGenerated(qrString);
                 setState(() {});
               },
@@ -67,9 +86,12 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter SSID',
           labelText: 'SSID',
           onChanged: (text) {
-            _ssid = text;
-            var qrString = WifiCred.getWifiQrString(_ssid, _password,
-                security: _selectedSecurity, hidden: _hidden);
+            var qrString = WifiCred.getWifiQrString(
+              ssidController.text,
+              passwordController.text,
+              security: selectedSecurity,
+              hidden: hidden,
+            );
             widget.onQrGenerated(qrString);
             setState(() {});
           },
@@ -79,9 +101,12 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter Password',
           labelText: 'Password',
           onChanged: (text) {
-            _password = text;
-            var qrString = WifiCred.getWifiQrString(_ssid, _password,
-                security: _selectedSecurity, hidden: _hidden);
+            var qrString = WifiCred.getWifiQrString(
+              ssidController.text,
+              passwordController.text,
+              security: selectedSecurity,
+              hidden: hidden,
+            );
             widget.onQrGenerated(qrString);
             setState(() {});
           },

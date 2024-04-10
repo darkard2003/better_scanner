@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/qr_generator.dart';
@@ -112,7 +111,10 @@ class QrGeneratorView extends StatelessWidget {
             onChanged: vm.updateName,
           ),
           const SizedBox(height: 8),
-          QrGeneratorField(type: state.type, onGenerate: vm.updateQrRecord),
+          QrGeneratorField(
+            qr: vm.qr,
+            onGenerate: vm.updateQrRecord,
+          ),
         ],
       ),
     );

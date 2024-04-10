@@ -63,30 +63,47 @@ class WifiCred extends QrRecordModel {
   }
 }
 
-class GeoLocation extends QrRecordModel {
-  late double latitude;
-  late double longitude;
+class GeoLocationQr extends QrRecordModel {
+  late double? latitude;
+  late double? longitude;
 
-  GeoLocation({
+  GeoLocationQr({
     required super.id,
     required super.name,
     required super.data,
     required super.type,
     required super.createdAt,
   }) {
-    var coords = data.split(':')[1].split(',');
-    latitude = double.parse(coords[0]);
-    longitude = double.parse(coords[1]);
+    var parsed = data.split(":");
+    if (parsed.length != 2) return;
+    var cords = parsed[1].split(',');
+    if (cords.length != 2) return;
+    latitude = double.tryParse(cords[0]);
+    longitude = double.tryParse(cords[1]);
   }
+
+  String get latStr => latitude?.toString() ?? "";
+  String get lonStr => longitude?.toString() ?? "";
 
   @override
   String get displayName => name.isEmpty ? 'Location' : name;
 
   @override
-  String get displayData => '$latitude,$longitude';
+  String get displayData => '${latitude ?? ""},${longitude ?? ""}';
 
   @override
-  String get copyData => '$latitude,$longitude';
+  String get copyData => '${latitude ?? ""},${longitude ?? ""}';
+
+  @override
+  bool get canOpen => (latitude != null && longitude != null);
+
+  static String getGeoQrString(double latitude, double longitude) {
+    return 'geo:$latitude,$longitude';
+  }
+
+  String toGoogleMapsUrl() {
+    return 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+  }
 }
 
 class UrlQrModel extends QrRecordModel {
