@@ -89,20 +89,19 @@ class QrGeneratorView extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(children: [
-              for (var type in QrType.values)
-                if (type != QrType.unknown)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(type.toString().split('.').last),
-                      selected: state.type == type,
-                      onSelected: (selected) {
-                        if (selected) {
-                          vm.updateType(type);
-                        }
-                      },
-                    ),
+              for (var type in vm.availableQrTypes)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: ChoiceChip(
+                    label: Text(type.toString().split('.').last),
+                    selected: state.type == type,
+                    onSelected: (selected) {
+                      if (selected) {
+                        vm.updateType(type);
+                      }
+                    },
                   ),
+                ),
             ]),
           ),
           const SizedBox(height: 16),

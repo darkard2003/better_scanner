@@ -9,6 +9,11 @@ class QrGeneratorVM extends Cubit<QRGeneratorState> {
   BuildContext context;
   QrRecordModel? qrIn;
   final TextEditingController nameController = TextEditingController();
+  final availableQrTypes = [
+    QrType.text,
+    QrType.url,
+    QrType.wifi,
+  ];
   QrGeneratorVM({
     required this.context,
     this.qrIn,
