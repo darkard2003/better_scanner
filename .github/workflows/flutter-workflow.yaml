@@ -19,7 +19,7 @@ jobs:
       - run: flutter analyze
       - name: Get latest tag
         id: get_tag
-        run: echo ::set-output name=tag::$(git describe --tags --always --abbrev=0)
+        run: echo "TAG=$(git describe --tags --always --abbrev=0)" >> $GITHUB_ENV
       - run: flutter build apk
       - name: Upload APK
         uses: actions/upload-artifact@v2
@@ -32,8 +32,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
-          release_name: Release ${{ steps.get_tag.outputs.tag }}
+          tag_name: ${{ env.TAG }}
+          release_name: Release ${{ env.TAG }}
           body: |
             Changes in this Release
           draft: false
