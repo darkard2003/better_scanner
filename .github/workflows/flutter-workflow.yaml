@@ -19,7 +19,7 @@ jobs:
       - run: flutter analyze
       - name: Get Latest Tag
         id: get_tag
-        run: echo tag=$(git describe --tags --abbrev=0) >> $GITHUB_STATE
+        run: echo tag=$(git describe --tags --always --abbrev=0) >> $GITHUB_STATE
       - run: flutter build apk
       - name: Upload APK
         uses: actions/upload-artifact@v2
