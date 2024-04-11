@@ -52,7 +52,7 @@ class QrRecordModel {
           createdAt: createdAt,
         );
       case QrType.wifi:
-        return WifiCred(
+        return WifiCredQr(
           id: id,
           name: name,
           data: data,
@@ -129,8 +129,12 @@ class QrRecordModel {
     }
   }
 
-  factory QrRecordModel.newEmpty({required data, type}) {
-    var id = const Uuid().v4().toString();
+  factory QrRecordModel.newEmpty({
+    required String data,
+    required QrType type,
+    String? id,
+  }) {
+    id ??= const Uuid().v4().toString();
     var createdAt = DateTime.now();
 
     return QrRecordModel.newType(

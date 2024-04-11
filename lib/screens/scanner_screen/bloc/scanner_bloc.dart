@@ -148,8 +148,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         ),
       );
     }
-    var record = event.record as UrlQrModel;
-    if (!await QrServices.canLaunch(record)) {
+    if (!await QrServices.canLaunch(event.record)) {
       emit(
         state.copyWith(
           msg: StateMessage(
@@ -159,6 +158,6 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
         ),
       );
     }
-    await QrServices.launch(record);
+    await QrServices.launch(event.record);
   }
 }

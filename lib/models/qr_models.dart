@@ -1,46 +1,30 @@
+import 'package:better_scanner/models/model_error.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/wifi_security.dart';
 
-class WifiCred extends QrRecordModel {
-  late String ssid;
-  late String password;
-  late WifiSecurity security;
-  late bool hidden;
+class WifiCredQr extends QrRecordModel {
+  String ssid = '';
+  String password = '';
+  WifiSecurity security = WifiSecurity.wpa;
+  bool hidden = false;
 
-  WifiCred({
+  WifiCredQr({
     required super.id,
     required super.name,
     required super.data,
     required super.type,
     required super.createdAt,
   }) {
-    var raw = data.split('WIFI:')[1];
-    var parts = raw.split(';');
-    var securityString = "";
-    for (var part in parts) {
-      if (part.startsWith('S:')) {
-        ssid = part.split(':')[1];
-      } else if (part.startsWith('P:')) {
-        password = part.split(':')[1];
-      } else if (part.startsWith('T:')) {
-        securityString = part.split(':').last;
-      } else if (part.startsWith('H:')) {
-        hidden = part.split(':').last.toLowerCase() == 'true';
-      }
-    }
-    switch (securityString.toUpperCase()) {
-      case 'wep':
-        security = WifiSecurity.wep;
-        break;
-      case 'wpa':
-        security = WifiSecurity.wpa;
-        break;
-      case 'nopass':
-        security = WifiSecurity.none;
-        break;
-      default:
-        security = WifiSecurity.none;
-        break;
+    var split = data.split('WIFI:');
+    if (split.length != 2) return;
+    try {
+      var parts = parseWifiQrString(data);
+      ssid = parts.$1;
+      password = parts.$2;
+      security = parts.$3;
+      hidden = parts.$4;
+    } catch (e) {
+      throw ModelPageError("Invalid wifi qr data");
     }
   }
 
@@ -61,6 +45,42 @@ class WifiCred extends QrRecordModel {
   }) {
     return "WIFI:T:${security.name};S:$ssid;P:$password;H:${hidden ? 'true' : ''};;";
   }
+
+  static (String, String, WifiSecurity, bool) parseWifiQrString(String data) {
+    if (!data.startsWith('WIFI:')) throw ModelPageError("Invalid wifi qr data");
+    var raw = data.split('WIFI:')[1];
+    var parts = raw.split(';');
+    var ssid = '';
+    var password = '';
+    var security = WifiSecurity.none;
+    var hidden = false;
+    for (var part in parts) {
+      if (part.startsWith('S:')) {
+        ssid = part.split(':')[1];
+      } else if (part.startsWith('P:')) {
+        password = part.split(':')[1];
+      } else if (part.startsWith('T:')) {
+        var securityString = part.split(':').last;
+        switch (securityString.toUpperCase()) {
+          case 'wep':
+            security = WifiSecurity.wep;
+            break;
+          case 'wpa':
+            security = WifiSecurity.wpa;
+            break;
+          case 'nopass':
+            security = WifiSecurity.none;
+            break;
+          default:
+            security = WifiSecurity.none;
+            break;
+        }
+      } else if (part.startsWith('H:')) {
+        hidden = part.split(':').last.toLowerCase() == 'true';
+      }
+    }
+    return (ssid, password, security, hidden);
+  }
 }
 
 class GeoLocationQr extends QrRecordModel {
@@ -74,12 +94,9 @@ class GeoLocationQr extends QrRecordModel {
     required super.type,
     required super.createdAt,
   }) {
-    var parsed = data.split(":");
-    if (parsed.length != 2) return;
-    var cords = parsed[1].split(',');
-    if (cords.length != 2) return;
-    latitude = double.tryParse(cords[0]);
-    longitude = double.tryParse(cords[1]);
+    var parsed = parseGeoQrString(data);
+    latitude = parsed.$1;
+    longitude = parsed.$2;
   }
 
   String get latStr => latitude?.toString() ?? "";
@@ -99,6 +116,17 @@ class GeoLocationQr extends QrRecordModel {
 
   static String getGeoQrString(double latitude, double longitude) {
     return 'geo:$latitude,$longitude';
+  }
+
+  static (double, double) parseGeoQrString(String data) {
+    if (!data.startsWith('geo:')) throw ModelPageError("Invalid geo qr data");
+    var parts = data.split(':');
+    if (parts.length != 2) return (0, 0);
+    var cords = parts[1].split(',');
+    if (cords.length != 2) return (0, 0);
+    var lat = double.tryParse(cords[0]);
+    var lon = double.tryParse(cords[1]);
+    return (lat ?? 0, lon ?? 0);
   }
 
   String toGoogleMapsUrl() {

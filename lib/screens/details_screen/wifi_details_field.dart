@@ -3,7 +3,7 @@ import 'package:better_scanner/screens/components/copy_text_field.dart';
 import 'package:flutter/material.dart';
 
 class WifiDetailsField extends StatefulWidget {
-  final WifiCred wifi;
+  final WifiCredQr wifi;
   final VoidCallback? onCopySsid;
   final VoidCallback? onCopyPassword;
 

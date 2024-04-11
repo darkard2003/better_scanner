@@ -1,15 +1,16 @@
-import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:flutter/material.dart';
 
 class TextQrGenerator extends StatefulWidget {
-  final QrRecordModel qr;
+  final String qrStr;
+  final QrType type;
   final Function(String) onQrGenerated;
   const TextQrGenerator({
     super.key,
     required this.onQrGenerated,
-    required this.qr,
+    required this.qrStr,
+    required this.type,
   });
 
   @override
@@ -22,15 +23,18 @@ class _TextQrGeneratorState extends State<TextQrGenerator> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.qr.data);
+    _controller = TextEditingController(text: widget.qrStr);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.qrStr != _controller.text) {
+      _controller.text = widget.qrStr;
+    }
     return DecoratedTextField(
       controller: _controller,
-      hintText: 'Enter ${widget.qr.type.name} here',
-      labelText: widget.qr.type.name,
+      hintText: 'Enter ${widget.type.name} here',
+      labelText: widget.type.name,
       onChanged: (text) => widget.onQrGenerated(text),
     );
   }

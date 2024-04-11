@@ -39,4 +39,31 @@ extension QrExtention on QrType {
         return 'Event';
     }
   }
+
+  String get defaultQrValue {
+    switch (this) {
+      case QrType.unknown:
+        return '';
+      case QrType.text:
+        return '';
+      case QrType.url:
+        return 'https://';
+      case QrType.wifi:
+        return 'WIFI:S:';
+      case QrType.geo:
+        return 'geo:0,0';
+      case QrType.phone:
+        return 'tel:';
+      case QrType.sms:
+        return 'sms:';
+      case QrType.email:
+        return 'mailto:';
+      case QrType.contact:
+        return 'MECARD:';
+      case QrType.calendar:
+        return 'BEGIN:VEVENT\nEND:VEVENT\n';
+      case QrType.event:
+        return 'BEGIN:VEVENT\nEND:VEVENT\n';
+    }
+  }
 }

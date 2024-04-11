@@ -77,11 +77,11 @@ class DetailsScreen extends StatelessWidget {
           const SizedBox(
             height: 20,
           ),
-          if (qr.runtimeType == WifiCred)
+          if (qr.runtimeType == WifiCredQr)
             Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: WifiDetailsField(
-                wifi: qr as WifiCred,
+                wifi: qr as WifiCredQr,
                 onCopySsid: () async {
                   await QrServices.copyTextToClipboard(qr.ssid);
                   if (!context.mounted) return;

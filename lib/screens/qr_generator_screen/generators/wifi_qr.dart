@@ -1,11 +1,12 @@
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/wifi_security.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
+import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:flutter/material.dart';
 
 class WifiQrGenerator extends StatefulWidget {
   final Function(String) onQrGenerated;
-  final WifiCred wifiQr;
+  final String wifiQr;
   const WifiQrGenerator({
     super.key,
     required this.onQrGenerated,
@@ -26,10 +27,22 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
   @override
   void initState() {
     super.initState();
-    ssidController = TextEditingController(text: widget.wifiQr.ssid);
-    passwordController = TextEditingController(text: widget.wifiQr.password);
-    selectedSecurity = widget.wifiQr.security;
-    hidden = widget.wifiQr.hidden;
+    var ssid = '';
+    var password = '';
+    hidden = false;
+    selectedSecurity = WifiSecurity.wpa;
+
+    try {
+      var parts = WifiCredQr.parseWifiQrString(widget.wifiQr);
+      ssid = parts.$1;
+      password = parts.$2;
+      selectedSecurity = parts.$3;
+      hidden = parts.$4;
+    } catch (e) {
+      showSnackbar(context, "Faild to parse qr", type: SnackbarType.error);
+    }
+    ssidController = TextEditingController(text: ssid);
+    passwordController = TextEditingController(text: password);
   }
 
   @override
@@ -50,7 +63,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
                             onSelected: (selected) {
                               if (selected) {
                                 selectedSecurity = s;
-                                var qrString = WifiCred.getWifiQrString(
+                                var qrString = WifiCredQr.getWifiQrString(
                                     ssidController.text,
                                     passwordController.text,
                                     security: selectedSecurity,
@@ -69,7 +82,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
               value: hidden,
               onChanged: (value) {
                 hidden = value!;
-                var qrString = WifiCred.getWifiQrString(
+                var qrString = WifiCredQr.getWifiQrString(
                   ssidController.text,
                   passwordController.text,
                   security: selectedSecurity,
@@ -83,10 +96,11 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
         ),
         const SizedBox(height: 8.0),
         DecoratedTextField(
+          controller: ssidController,
           hintText: 'Enter SSID',
           labelText: 'SSID',
           onChanged: (text) {
-            var qrString = WifiCred.getWifiQrString(
+            var qrString = WifiCredQr.getWifiQrString(
               ssidController.text,
               passwordController.text,
               security: selectedSecurity,
@@ -98,10 +112,11 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
         ),
         const SizedBox(height: 8.0),
         DecoratedTextField(
+          controller: passwordController,
           hintText: 'Enter Password',
           labelText: 'Password',
           onChanged: (text) {
-            var qrString = WifiCred.getWifiQrString(
+            var qrString = WifiCredQr.getWifiQrString(
               ssidController.text,
               passwordController.text,
               security: selectedSecurity,

@@ -1,9 +1,12 @@
 import 'dart:ui';
 
+import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/screens/components/copy_text_box.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/decorated_text_field.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/qr_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/qr_generator_vm.dart';
+import 'package:better_scanner/screens/shared/show_confirmation_dialog.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -88,14 +91,25 @@ class QrGeneratorView extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(children: [
-              for (var type in vm.availableQrTypes)
+              for (var type in vm.availableTypes)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: ChoiceChip(
-                    label: Text(type.toString().split('.').last),
+                    label: Text(type.name),
                     selected: state.type == type,
-                    onSelected: (selected) {
+                    onSelected: (selected) async {
                       if (selected) {
+                        if (state.qrString.isNotEmpty &&
+                            state.qrString != state.type.defaultQrValue) {
+                          var confirmed = await showConfiramtionDialog(
+                                context,
+                                heading: 'Change QR Type?',
+                                msg:
+                                    'Changing the QR Type will reset the QR data. Are you sure you want to continue?',
+                              ) ??
+                              false;
+                          if (!confirmed) return;
+                        }
                         vm.updateType(type);
                       }
                     },
@@ -112,9 +126,12 @@ class QrGeneratorView extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           QrGeneratorField(
-            qr: vm.qr,
+            qrStr: state.qrString,
+            type: state.type,
             onGenerate: vm.updateQrRecord,
           ),
+          const SizedBox(height: 16),
+          CopyTextBox(text: state.qrString),
         ],
       ),
     );
