@@ -17,9 +17,9 @@ jobs:
           channel: "stable"
       - run: flutter pub get
       - run: flutter analyze
-      - name: Get Latest Tag
+      - name: Get latest tag
         id: get_tag
-        run: echo tag=$(git describe --tags --always --abbrev=0) >> $GITHUB_STATE
+        run: echo ::set-output name=tag::$(git describe --tags --always --abbrev=0)
       - run: flutter build apk
       - name: Upload APK
         uses: actions/upload-artifact@v2
