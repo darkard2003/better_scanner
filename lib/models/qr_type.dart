@@ -55,7 +55,7 @@ extension QrExtention on QrType {
       case QrType.phone:
         return 'tel:';
       case QrType.sms:
-        return 'sms:';
+        return "SMSTO:";
       case QrType.email:
         return 'mailto:';
       case QrType.contact:

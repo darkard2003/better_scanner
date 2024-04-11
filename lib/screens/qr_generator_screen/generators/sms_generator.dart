@@ -27,8 +27,8 @@ class _SMSQrGeneratorState extends State<SMSQrGenerator> {
     var phone = '';
     try {
       var parts = SMSQr.parseSmsQrString(widget.smsQr);
-      sms = parts.$1;
-      phone = parts.$2;
+      sms = parts.$2;
+      phone = parts.$1;
     } catch (e) {
       showSnackbar(context, "Faild to parse qr", type: SnackbarType.error);
     }
@@ -45,8 +45,8 @@ class _SMSQrGeneratorState extends State<SMSQrGenerator> {
 
   void onChanged() {
     widget.onQrGenerated(SMSQr.getSmsQrString(
-      smsController.text,
       phoneController.text,
+      smsController.text,
     ));
   }
 
