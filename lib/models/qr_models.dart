@@ -212,11 +212,11 @@ class PhoneQr extends QrRecordModel {
   }
 }
 
-class Sms extends QrRecordModel {
+class SMSQr extends QrRecordModel {
   late String number;
   late String message;
 
-  Sms({
+  SMSQr({
     required super.id,
     required super.name,
     required super.data,
