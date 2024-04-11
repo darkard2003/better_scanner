@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_event.dart';
 import 'package:better_scanner/screens/scanner_screen/bloc/scanner_state.dart';
