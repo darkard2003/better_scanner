@@ -180,17 +180,17 @@ class UrlQrModel extends QrRecordModel {
   }
 }
 
-class Phone extends QrRecordModel {
+class PhoneQr extends QrRecordModel {
   late String number;
 
-  Phone({
+  PhoneQr({
     required super.id,
     required super.name,
     required super.data,
     required super.type,
     required super.createdAt,
   }) {
-    number = data.split(':')[1];
+    number = parsePhoneQrString(data);
   }
 
   @override
@@ -201,6 +201,15 @@ class Phone extends QrRecordModel {
 
   @override
   String get copyData => number;
+
+  static String getPhoneQrString(String number) {
+    return 'tel:$number';
+  }
+
+  static String parsePhoneQrString(String data) {
+    if (!data.startsWith('tel:')) throw ModelPageError("Invalid phone qr data");
+    return data.split(':')[1];
+  }
 }
 
 class Sms extends QrRecordModel {
@@ -214,9 +223,9 @@ class Sms extends QrRecordModel {
     required super.type,
     required super.createdAt,
   }) {
-    var parts = data.split(':');
-    number = parts[1];
-    message = parts[2];
+    var parts = parseSmsQrString(data);
+    number = parts.$1;
+    message = parts.$2;
   }
 
   @override
@@ -227,6 +236,17 @@ class Sms extends QrRecordModel {
 
   @override
   String get copyData => '$number\n$message';
+
+  static String getSmsQrString(String number, String message) {
+    return 'SMSTO:$number:$message';
+  }
+
+  static (String, String) parseSmsQrString(String data) {
+    if (!data.startsWith('SMSTO:')) throw ModelPageError("Invalid sms qr data");
+    var parts = data.split(':');
+    if (parts.length != 3) return ('', '');
+    return (parts[1], parts[2]);
+  }
 }
 
 class Email extends QrRecordModel {

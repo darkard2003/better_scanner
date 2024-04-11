@@ -46,6 +46,22 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
   }
 
   @override
+  void dispose() {
+    ssidController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void onChanged() {
+    widget.onQrGenerated(WifiCredQr.getWifiQrString(
+      ssidController.text,
+      passwordController.text,
+      selectedSecurity,
+      hidden,
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,

@@ -43,6 +43,13 @@ class _GeoQrGeneratorState extends State<GeoQrGenerator> {
   }
 
   @override
+  void dispose() {
+    latText.dispose();
+    lonText.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,

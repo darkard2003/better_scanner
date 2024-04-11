@@ -5,4 +5,6 @@ const availableQrTypes = [
   QrType.url,
   QrType.wifi,
   QrType.geo,
+  QrType.phone,
+  QrType.sms,
 ];

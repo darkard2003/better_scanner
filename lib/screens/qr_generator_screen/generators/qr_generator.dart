@@ -1,6 +1,8 @@
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/geo_generator.dart';
+import 'package:better_scanner/screens/qr_generator_screen/generators/phone_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/plain_text.dart';
+import 'package:better_scanner/screens/qr_generator_screen/generators/sms_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/wifi_qr.dart';
 import 'package:flutter/material.dart';
 
@@ -27,6 +29,16 @@ class QrGeneratorField extends StatelessWidget {
         return GeoQrGenerator(
           onQrGenerated: onGenerate,
           qrData: qrStr,
+        );
+      case QrType.phone:
+        return PhoneQrGenerator(
+          onQrGenerated: onGenerate,
+          phoneQr: qrStr,
+        );
+      case QrType.sms:
+        return SMSQrGenerator(
+          onQrGenerated: onGenerate,
+          smsQr: qrStr,
         );
       default:
         return TextQrGenerator(

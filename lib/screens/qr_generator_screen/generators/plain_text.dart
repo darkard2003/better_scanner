@@ -27,6 +27,12 @@ class _TextQrGeneratorState extends State<TextQrGenerator> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.qrStr != _controller.text) {
       _controller.text = widget.qrStr;
