@@ -2,8 +2,10 @@ import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_box.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/shareable_qr_preview.dart';
-import 'package:better_scanner/screens/details_screen/maps_details_field.dart';
-import 'package:better_scanner/screens/details_screen/wifi_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/maps_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/phone_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/sms_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/wifi_details_field.dart';
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
@@ -116,6 +118,29 @@ class DetailsScreen extends StatelessWidget {
                       context, "Latitude and Longitude copied to clipbard");
                 },
               ),
+            )
+          else if (qr.runtimeType == PhoneQr)
+            PhoneDetailsField(
+              phone: qr as PhoneQr,
+              onCopyPhone: (phone) async {
+                await QrServices.copyTextToClipboard(phone);
+                if (!context.mounted) return;
+                showSnackbar(context, "Phone copied to clipbard");
+              },
+            )
+          else if (qr.runtimeType == SMSQr)
+            SmsDetailsField(
+              sms: qr as SMSQr,
+              onCopySms: (sms) async {
+                await QrServices.copyTextToClipboard(sms);
+                if (!context.mounted) return;
+                showSnackbar(context, "SMS copied to clipbard");
+              },
+              onCopyPhone: (phone) async {
+                await QrServices.copyTextToClipboard(phone);
+                if (!context.mounted) return;
+                showSnackbar(context, "Phone copied to clipbard");
+              },
             ),
           CopyTextBox(
             text: qr.data,
