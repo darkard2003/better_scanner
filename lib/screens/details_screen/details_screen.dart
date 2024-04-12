@@ -41,10 +41,9 @@ class DetailsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CustomIconButton(
-                icon: Icon(
+              IconButton(
+                icon: const Icon(
                   Icons.copy,
-                  color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () async {
                   await QrServices.copyTextToClipboard(qr.copyData);
@@ -54,10 +53,9 @@ class DetailsScreen extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               if (qr.canOpen) ...[
-                CustomIconButton(
-                  icon: Icon(
+                IconButton(
+                  icon: const Icon(
                     Icons.launch,
-                    color: theme.colorScheme.onPrimary,
                   ),
                   onPressed: () async {
                     await QrServices.launch(qr);
@@ -65,10 +63,9 @@ class DetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
               ],
-              CustomIconButton(
-                icon: Icon(
+              IconButton(
+                icon: const Icon(
                   Icons.share,
-                  color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () async {
                   await QrServices.shareQrText(qr);
@@ -120,27 +117,33 @@ class DetailsScreen extends StatelessWidget {
               ),
             )
           else if (qr.runtimeType == PhoneQr)
-            PhoneDetailsField(
-              phone: qr as PhoneQr,
-              onCopyPhone: (phone) async {
-                await QrServices.copyTextToClipboard(phone);
-                if (!context.mounted) return;
-                showSnackbar(context, "Phone copied to clipbard");
-              },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: PhoneDetailsField(
+                phone: qr as PhoneQr,
+                onCopyPhone: (phone) async {
+                  await QrServices.copyTextToClipboard(phone);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Phone copied to clipbard");
+                },
+              ),
             )
           else if (qr.runtimeType == SMSQr)
-            SmsDetailsField(
-              sms: qr as SMSQr,
-              onCopySms: (sms) async {
-                await QrServices.copyTextToClipboard(sms);
-                if (!context.mounted) return;
-                showSnackbar(context, "SMS copied to clipbard");
-              },
-              onCopyPhone: (phone) async {
-                await QrServices.copyTextToClipboard(phone);
-                if (!context.mounted) return;
-                showSnackbar(context, "Phone copied to clipbard");
-              },
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: SmsDetailsField(
+                sms: qr as SMSQr,
+                onCopySms: (sms) async {
+                  await QrServices.copyTextToClipboard(sms);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "SMS copied to clipbard");
+                },
+                onCopyPhone: (phone) async {
+                  await QrServices.copyTextToClipboard(phone);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Phone copied to clipbard");
+                },
+              ),
             ),
           CopyTextBox(
             text: qr.data,
