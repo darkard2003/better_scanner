@@ -7,4 +7,5 @@ const availableQrTypes = [
   QrType.geo,
   QrType.phone,
   QrType.sms,
+  QrType.email,
 ];

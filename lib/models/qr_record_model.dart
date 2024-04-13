@@ -86,7 +86,7 @@ class QrRecordModel {
         );
 
       case QrType.email:
-        return Email(
+        return EmailQr(
           id: id,
           name: name,
           data: data,

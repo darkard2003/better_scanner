@@ -1,4 +1,5 @@
 import 'package:better_scanner/models/qr_type.dart';
+import 'package:better_scanner/screens/qr_generator_screen/generators/email_qr_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/geo_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/phone_generator.dart';
 import 'package:better_scanner/screens/qr_generator_screen/generators/plain_text.dart';
@@ -39,6 +40,11 @@ class QrGeneratorField extends StatelessWidget {
         return SMSQrGenerator(
           onQrGenerated: onGenerate,
           smsQr: qrStr,
+        );
+      case QrType.email:
+        return EmailQrGenerator(
+          onQrGenerated: onGenerate,
+          qrString: qrStr,
         );
       default:
         return TextQrGenerator(

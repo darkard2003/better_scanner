@@ -249,12 +249,12 @@ class SMSQr extends QrRecordModel {
   }
 }
 
-class Email extends QrRecordModel {
+class EmailQr extends QrRecordModel {
   late String address;
   late String subject;
   late String body;
 
-  Email({
+  EmailQr({
     required super.id,
     required super.name,
     required super.data,
@@ -275,6 +275,23 @@ class Email extends QrRecordModel {
 
   @override
   String get copyData => '$address\n$subject\n$body';
+
+  static String getEmailQrString(String address, String subject, String body) {
+    return 'MATMSG:TO:$address;SUB:$subject;BODY:$body;;';
+  }
+
+  static (String, String, String) parseEmailQrString(String data) {
+    if (!data.startsWith('MATMSG:')) {
+      throw ModelPageError("Invalid email qr data");
+    }
+    var parts = data.replaceAll('MATMSG:', '').split(';');
+    if (parts.length != 3) return ('', '', '');
+    return (
+      parts[0].split(':')[1],
+      parts[1].split(':')[1],
+      parts[2].split(':')[1]
+    );
+  }
 }
 
 class VCard extends QrRecordModel {

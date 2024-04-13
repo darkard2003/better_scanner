@@ -1,7 +1,7 @@
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_box.dart';
-import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/shareable_qr_preview.dart';
+import 'package:better_scanner/screens/details_screen/components/email_details_screen.dart';
 import 'package:better_scanner/screens/details_screen/components/maps_details_field.dart';
 import 'package:better_scanner/screens/details_screen/components/phone_details_field.dart';
 import 'package:better_scanner/screens/details_screen/components/sms_details_field.dart';
@@ -20,8 +20,6 @@ class DetailsScreen extends StatelessWidget {
     var args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     var qr = args['qr'] as QrRecordModel;
-
-    var theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -142,6 +140,28 @@ class DetailsScreen extends StatelessWidget {
                   await QrServices.copyTextToClipboard(phone);
                   if (!context.mounted) return;
                   showSnackbar(context, "Phone copied to clipbard");
+                },
+              ),
+            )
+          else if (qr.runtimeType == EmailQr)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: EmailDetailsField(
+                email: qr as EmailQr,
+                onCopyEmail: (email) async {
+                  await QrServices.copyTextToClipboard(email);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Email copied to clipbard");
+                },
+                onCopySubject: (subject) async {
+                  await QrServices.copyTextToClipboard(subject);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Subject copied to clipbard");
+                },
+                onCopyBody: (body) async {
+                  await QrServices.copyTextToClipboard(body);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Body copied to clipbard");
                 },
               ),
             ),
