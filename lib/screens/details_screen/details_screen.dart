@@ -1,5 +1,6 @@
 import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_box.dart';
+import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/shareable_qr_preview.dart';
 import 'package:better_scanner/screens/details_screen/components/email_details_screen.dart';
 import 'package:better_scanner/screens/details_screen/components/maps_details_field.dart';
@@ -39,7 +40,7 @@ class DetailsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
+              CustomIconButton(
                 icon: const Icon(
                   Icons.copy,
                 ),
@@ -51,7 +52,7 @@ class DetailsScreen extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               if (qr.canOpen) ...[
-                IconButton(
+                CustomIconButton(
                   icon: const Icon(
                     Icons.launch,
                   ),
@@ -61,7 +62,7 @@ class DetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
               ],
-              IconButton(
+              CustomIconButton(
                 icon: const Icon(
                   Icons.share,
                 ),
