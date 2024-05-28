@@ -19,7 +19,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   late Database db;
   var records = <QrRecordModel>[];
   var controller = MobileScannerController(
+    facing: CameraFacing.back,
     detectionSpeed: DetectionSpeed.noDuplicates,
+    torchEnabled: true,
   );
   final BuildContext context;
 
@@ -109,6 +111,20 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   }
 
   void _onScan(ScannerEventScan event, Emitter<ScannerState> emit) async {
+    records = await db.getRecords();
+    if (records.firstOrNull?.data == event.record.data) return;
+    if (records.any((element) => element.data == event.record.data)) {
+      emit(
+        state.copyWith(
+          msg: StateMessage(
+            message: 'Record already exists',
+            type: StateMessageType.error,
+          ),
+        ),
+      );
+      return;
+    }
+
     await db.addRecord(event.record);
     records = await db.getRecords();
     emit(

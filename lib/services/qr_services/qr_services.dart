@@ -90,6 +90,7 @@ class QrServices {
       return false;
     }
 
-    return await controller.analyzeImage(path);
+    await controller.analyzeImage(path);
+    return true;
   }
 }

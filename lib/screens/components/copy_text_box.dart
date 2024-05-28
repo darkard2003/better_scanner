@@ -34,7 +34,7 @@ class CopyTextBox extends StatelessWidget {
         ),
         Positioned(
         top: 0,
-        right: 0,
+        right: 10,
           child: IconButton(
             icon: const Icon(
               Icons.copy,

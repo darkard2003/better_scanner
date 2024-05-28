@@ -15,14 +15,14 @@ class CustomIconButton extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     return IconButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(colorScheme.primary),
-        shape: MaterialStateProperty.all(
+        backgroundColor: WidgetStateProperty.all(colorScheme.primary),
+        shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        elevation: MaterialStateProperty.all(2),
-        foregroundColor: MaterialStateProperty.all(colorScheme.onPrimary),
+        elevation: WidgetStateProperty.all(2),
+        foregroundColor: WidgetStateProperty.all(colorScheme.onPrimary),
       ),
       onPressed: onPressed,
       icon: icon,

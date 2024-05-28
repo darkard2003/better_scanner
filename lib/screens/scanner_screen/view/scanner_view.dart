@@ -49,13 +49,12 @@ class _ScannerViewState extends State<ScannerView> with WidgetsBindingObserver {
     }
   }
 
-  // @override
-  // Future<void> didChangeDependencies() async {
-  //   await _controller.stop();
-  //   super.didChangeDependencies();
-  //   _subscription = _controller.barcodes.listen(_handleBarcode);
-  //   await _controller.start();
-  // }
+  @override
+  Future<void> didChangeDependencies() async {
+    await _controller.stop();
+    super.didChangeDependencies();
+    await _controller.start();
+  }
 
   @override
   void initState() {
@@ -72,7 +71,6 @@ class _ScannerViewState extends State<ScannerView> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_subscription?.cancel());
     super.dispose();
-    _controller.dispose();
   }
 
   List<Widget> _buildActions() {
@@ -88,14 +86,14 @@ class _ScannerViewState extends State<ScannerView> with WidgetsBindingObserver {
         },
       ),
       ValueListenableBuilder(
-        valueListenable: _controller.torchState,
-        builder: (context, value, widget) {
-          bool torchEnabled = value == TorchState.on;
+        valueListenable: _controller,
+        builder: (context, state, widget) {
+          bool torchEnabled = state.torchState == TorchState.on;
           return IconButton(
             icon: Icon(
               torchEnabled ? Icons.flash_on : Icons.flash_off,
             ),
-            onPressed: _controller.hasTorch
+            onPressed: state.torchState != TorchState.unavailable
                 ? () {
                     torchEnabled
                         ? _controller.toggleTorch()
@@ -106,9 +104,9 @@ class _ScannerViewState extends State<ScannerView> with WidgetsBindingObserver {
         },
       ),
       ValueListenableBuilder(
-          valueListenable: _controller.cameraFacingState,
-          builder: (context, value, widget) {
-            bool cameraFacingBack = value == CameraFacing.back;
+          valueListenable: _controller,
+          builder: (context, state, widget) {
+            bool cameraFacingBack = state.cameraDirection == CameraFacing.back;
             return IconButton(
               icon: Icon(
                 cameraFacingBack ? Icons.camera_front : Icons.camera_rear,
@@ -218,7 +216,7 @@ class HistoryView extends StatelessWidget {
     return Container(
       constraints: const BoxConstraints(maxWidth: 600),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),

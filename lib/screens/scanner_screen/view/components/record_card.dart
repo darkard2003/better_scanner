@@ -89,21 +89,21 @@ class RecordCard extends StatelessWidget {
             ),
             trailing: IconButton(
               style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all(
+                foregroundColor: WidgetStateProperty.all(
                   record.canOpen
                       ? Theme.of(context).colorScheme.primary
                       : Theme.of(context).colorScheme.onSurface,
                 ),
-                shape: MaterialStateProperty.all(
+                shape: WidgetStateProperty.all(
                   const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     // side: BorderSide(color: Colors.grey),
                   ),
                 ),
-                shadowColor: MaterialStateProperty.all(
+                shadowColor: WidgetStateProperty.all(
                     Theme.of(context).colorScheme.shadow),
-                elevation: MaterialStateProperty.all(3),
-                backgroundColor: MaterialStateProperty.all(
+                elevation: WidgetStateProperty.all(3),
+                backgroundColor: WidgetStateProperty.all(
                     Theme.of(context).colorScheme.primaryContainer),
               ),
               onPressed: () {

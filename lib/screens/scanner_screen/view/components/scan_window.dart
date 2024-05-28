@@ -32,25 +32,16 @@ class ScanWindow extends StatelessWidget {
   }
 }
 
-Iterable<Widget> buildActions(
-    BuildContext context, MobileScannerController controller) sync* {
-  yield ValueListenableBuilder(
-      valueListenable: controller.cameraFacingState,
-      builder: (context, value, child) {
-        return IconButton(
-          icon: Icon(value == CameraFacing.back
-              ? Icons.camera_front
-              : Icons.camera_rear),
-          onPressed: () => controller.switchCamera(),
-        );
-      });
-  yield ValueListenableBuilder(
-    valueListenable: controller.torchState,
-    builder: (context, value, child) {
-      return IconButton(
-        icon: Icon(value == TorchState.off ? Icons.flash_off : Icons.flash_on),
-        onPressed: () => controller.hasTorch ? controller.toggleTorch() : null,
-      );
-    },
-  );
-}
+// Iterable<Widget> buildActions(
+//     BuildContext context, MobileScannerController controller) sync* {
+//   yield IconButton(
+//     icon: Icon(controller.facing == CameraFacing.back
+//         ? Icons.camera_front
+//         : Icons.camera_rear),
+//     onPressed: () => controller.switchCamera(),
+//   );
+//   yield IconButton(
+//     icon: Icon(controller== TorchState.off ? Icons.flash_off : Icons.flash_on),
+//     onPressed: () => controller.hasTorch ? controller.toggleTorch() : null,
+//   );
+// }
