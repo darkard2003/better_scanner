@@ -46,6 +46,22 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
   }
 
   @override
+  void dispose() {
+    ssidController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void onChanged() {
+    widget.onQrGenerated(WifiCredQr.getWifiQrString(
+      ssidController.text,
+      passwordController.text,
+      security: selectedSecurity,
+      hidden: hidden,
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -63,13 +79,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
                             onSelected: (selected) {
                               if (selected) {
                                 selectedSecurity = s;
-                                var qrString = WifiCredQr.getWifiQrString(
-                                    ssidController.text,
-                                    passwordController.text,
-                                    security: selectedSecurity,
-                                    hidden: hidden);
-                                widget.onQrGenerated(qrString);
-                                setState(() {});
+                                onChanged();
                               }
                             },
                           ),
@@ -82,14 +92,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
               value: hidden,
               onChanged: (value) {
                 hidden = value!;
-                var qrString = WifiCredQr.getWifiQrString(
-                  ssidController.text,
-                  passwordController.text,
-                  security: selectedSecurity,
-                  hidden: hidden,
-                );
-                widget.onQrGenerated(qrString);
-                setState(() {});
+                onChanged();
               },
             ),
           ],
@@ -100,14 +103,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter SSID',
           labelText: 'SSID',
           onChanged: (text) {
-            var qrString = WifiCredQr.getWifiQrString(
-              ssidController.text,
-              passwordController.text,
-              security: selectedSecurity,
-              hidden: hidden,
-            );
-            widget.onQrGenerated(qrString);
-            setState(() {});
+            onChanged();
           },
         ),
         const SizedBox(height: 8.0),
@@ -116,14 +112,7 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
           hintText: 'Enter Password',
           labelText: 'Password',
           onChanged: (text) {
-            var qrString = WifiCredQr.getWifiQrString(
-              ssidController.text,
-              passwordController.text,
-              security: selectedSecurity,
-              hidden: hidden,
-            );
-            widget.onQrGenerated(qrString);
-            setState(() {});
+            onChanged();
           },
           obscureText: !_showPassword,
           suffix: IconButton(

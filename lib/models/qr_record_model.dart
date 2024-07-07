@@ -68,7 +68,7 @@ class QrRecordModel {
           createdAt: createdAt,
         );
       case QrType.phone:
-        return Phone(
+        return PhoneQr(
           id: id,
           name: name,
           data: data,
@@ -77,7 +77,7 @@ class QrRecordModel {
         );
 
       case QrType.sms:
-        return Sms(
+        return SMSQr(
           id: id,
           name: name,
           data: data,
@@ -86,7 +86,7 @@ class QrRecordModel {
         );
 
       case QrType.email:
-        return Email(
+        return EmailQr(
           id: id,
           name: name,
           data: data,

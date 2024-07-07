@@ -12,26 +12,21 @@ class CustomIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
-            ),
-          ],
+    var colorScheme = Theme.of(context).colorScheme;
+    return IconButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.all(colorScheme.primary),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: icon,
-        ),
+        elevation: WidgetStateProperty.all(2),
+        foregroundColor: WidgetStateProperty.all(colorScheme.onPrimary),
       ),
+      onPressed: onPressed,
+      icon: icon,
+      iconSize: 30,
     );
   }
 }

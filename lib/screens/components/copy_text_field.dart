@@ -25,14 +25,24 @@ class CopyTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('$title: '),
             Expanded(
-              child: Text(obscureText ? "*" * text.length : text,),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            if(trailing != null) trailing!,
+            Expanded(
+              child: Text(
+                obscureText ? "*" * text.length : text,
+              ),
+            ),
+            if (trailing != null) trailing!,
             IconButton(
               icon: const Icon(
                 Icons.copy,

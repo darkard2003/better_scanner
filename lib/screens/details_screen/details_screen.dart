@@ -2,8 +2,11 @@ import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/screens/components/copy_text_box.dart';
 import 'package:better_scanner/screens/components/custom_icon_button.dart';
 import 'package:better_scanner/screens/components/shareable_qr_preview.dart';
-import 'package:better_scanner/screens/details_screen/maps_details_field.dart';
-import 'package:better_scanner/screens/details_screen/wifi_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/email_details_screen.dart';
+import 'package:better_scanner/screens/details_screen/components/maps_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/phone_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/sms_details_field.dart';
+import 'package:better_scanner/screens/details_screen/components/wifi_details_field.dart';
 import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +21,6 @@ class DetailsScreen extends StatelessWidget {
     var args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     var qr = args['qr'] as QrRecordModel;
-
-    var theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,9 +41,8 @@ class DetailsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CustomIconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.copy,
-                  color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () async {
                   await QrServices.copyTextToClipboard(qr.copyData);
@@ -53,9 +53,8 @@ class DetailsScreen extends StatelessWidget {
               const SizedBox(width: 16),
               if (qr.canOpen) ...[
                 CustomIconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.launch,
-                    color: theme.colorScheme.onPrimary,
                   ),
                   onPressed: () async {
                     await QrServices.launch(qr);
@@ -64,9 +63,8 @@ class DetailsScreen extends StatelessWidget {
                 const SizedBox(width: 16),
               ],
               CustomIconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.share,
-                  color: theme.colorScheme.onPrimary,
                 ),
                 onPressed: () async {
                   await QrServices.shareQrText(qr);
@@ -114,6 +112,57 @@ class DetailsScreen extends StatelessWidget {
                   if (!context.mounted) return;
                   showSnackbar(
                       context, "Latitude and Longitude copied to clipbard");
+                },
+              ),
+            )
+          else if (qr.runtimeType == PhoneQr)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: PhoneDetailsField(
+                phone: qr as PhoneQr,
+                onCopyPhone: (phone) async {
+                  await QrServices.copyTextToClipboard(phone);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Phone copied to clipbard");
+                },
+              ),
+            )
+          else if (qr.runtimeType == SMSQr)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: SmsDetailsField(
+                sms: qr as SMSQr,
+                onCopySms: (sms) async {
+                  await QrServices.copyTextToClipboard(sms);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "SMS copied to clipbard");
+                },
+                onCopyPhone: (phone) async {
+                  await QrServices.copyTextToClipboard(phone);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Phone copied to clipbard");
+                },
+              ),
+            )
+          else if (qr.runtimeType == EmailQr)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: EmailDetailsField(
+                email: qr as EmailQr,
+                onCopyEmail: (email) async {
+                  await QrServices.copyTextToClipboard(email);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Email copied to clipbard");
+                },
+                onCopySubject: (subject) async {
+                  await QrServices.copyTextToClipboard(subject);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Subject copied to clipbard");
+                },
+                onCopyBody: (body) async {
+                  await QrServices.copyTextToClipboard(body);
+                  if (!context.mounted) return;
+                  showSnackbar(context, "Body copied to clipbard");
                 },
               ),
             ),
