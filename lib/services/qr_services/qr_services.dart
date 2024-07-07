@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:better_scanner/models/qr_models.dart';
@@ -92,5 +93,14 @@ class QrServices {
 
     await controller.analyzeImage(path);
     return true;
+  }
+
+  static Future<String?> checkRedirection(String url) async {
+    final uri = Uri.parse(url);
+    final client = HttpClient();
+    final request = await client.getUrl(uri);
+    final response = await request.close();
+    final location = response.headers.value('location');
+    return location;
   }
 }

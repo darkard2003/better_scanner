@@ -1,6 +1,6 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
-import 'package:better_scanner/screens/scanner_screen/bloc/scanner_bloc.dart';
+import 'package:better_scanner/screens/scanner_screen/scanner_screen_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -42,7 +42,7 @@ class RecordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var scannerBloc = BlocProvider.of<ScannerBloc>(context);
+    var vm = context.read<ScannerScreenVM>();
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 3,
@@ -56,13 +56,13 @@ class RecordCard extends StatelessWidget {
                   onPressed: (context) {
                     switch (action) {
                       case RecordAction.rename:
-                        scannerBloc.add(ScannerEventEdit(record));
+                        vm.onEdit(record);
                         break;
                       case RecordAction.delete:
-                        scannerBloc.add(ScannerEventDelete(record));
+                        vm.onDelete(record);
                         break;
                       case RecordAction.share:
-                        scannerBloc.add(ScannerEventShare(record));
+                        vm.onShare(record);
                         break;
                     }
                   },
@@ -76,7 +76,7 @@ class RecordCard extends StatelessWidget {
         ),
         child: ListTile(
             leading: Icon(record.type.icon),
-            onTap: () => context.read<ScannerBloc>().add(ScannerEventOnTap(record)),
+            onTap: () => vm.onTap,
             title: Text(
               record.name.isEmpty ? record.displayName : record.name,
               maxLines: 1,
@@ -108,10 +108,10 @@ class RecordCard extends StatelessWidget {
               ),
               onPressed: () {
                 if (record.canOpen) {
-                  scannerBloc.add(ScannerEventOpenUrl(record));
+                  vm.openUrl(record);
                   return;
                 }
-                scannerBloc.add(ScannerEventCopy(record));
+                vm.onCopy(record);
               },
               icon: record.canOpen
                   ? const Icon(Icons.open_in_new)
