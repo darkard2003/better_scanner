@@ -1,48 +1,29 @@
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
-import 'package:better_scanner/screens/scanner_screen/scanner_screen_vm.dart';
+import 'package:better_scanner/screens/scanner_screen/view/components/record_action.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:provider/provider.dart';
-
-enum RecordAction {
-  rename,
-  share,
-  delete,
-}
-
-extension on RecordAction {
-  Color? get foregroundColor {
-    if (this == RecordAction.delete) {
-      return Colors.red;
-    }
-    return null;
-  }
-
-  IconData get icon {
-    switch (this) {
-      case RecordAction.rename:
-        return Icons.edit_outlined;
-      case RecordAction.delete:
-        return Icons.delete_outlined;
-      case RecordAction.share:
-        return Icons.share_outlined;
-      default:
-        return Icons.edit;
-    }
-  }
-}
 
 class RecordCard extends StatelessWidget {
   final QrRecordModel record;
+  final Function(QrRecordModel) onTap;
+  final Function(QrRecordModel) onEdit;
+  final Function(QrRecordModel) onDelete;
+  final Function(QrRecordModel) onShare;
+  final Function(QrRecordModel) shortcutAction;
+
   const RecordCard({
     super.key,
     required this.record,
+    required this.onTap,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onShare,
+    required this.shortcutAction,
   });
 
   @override
   Widget build(BuildContext context) {
-    var vm = context.read<ScannerScreenVM>();
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 3,
@@ -50,33 +31,30 @@ class RecordCard extends StatelessWidget {
         key: ValueKey(record),
         startActionPane: ActionPane(
           motion: const BehindMotion(),
-          children: RecordAction.values
-              .map(
-                (action) => SlidableAction(
-                  onPressed: (context) {
-                    switch (action) {
-                      case RecordAction.rename:
-                        vm.onEdit(record);
-                        break;
-                      case RecordAction.delete:
-                        vm.onDelete(record);
-                        break;
-                      case RecordAction.share:
-                        vm.onShare(record);
-                        break;
-                    }
-                  },
-                  icon: action.icon,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  foregroundColor: action.foregroundColor,
-                ),
-              )
-              .toList(),
+          children: [
+            SlidableAction(
+              onPressed: (context) => onEdit(record),
+              icon: RecordAction.edit.icon,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              foregroundColor: RecordAction.edit.foregroundColor,
+            ),
+            SlidableAction(
+              onPressed: (context) => onDelete(record),
+              icon: RecordAction.delete.icon,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              foregroundColor: RecordAction.delete.foregroundColor,
+            ),
+            SlidableAction(
+              onPressed: (context) => onShare(record),
+              icon: RecordAction.share.icon,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              foregroundColor: RecordAction.share.foregroundColor,
+            ),
+          ],
         ),
         child: ListTile(
             leading: Icon(record.type.icon),
-            onTap: () => vm.onTap(record),
+            onTap: () => onTap(record),
             title: Text(
               record.name.isEmpty ? record.displayName : record.name,
               maxLines: 1,
@@ -106,13 +84,7 @@ class RecordCard extends StatelessWidget {
                 backgroundColor: WidgetStateProperty.all(
                     Theme.of(context).colorScheme.primaryContainer),
               ),
-              onPressed: () {
-                if (record.canOpen) {
-                  vm.openUrl(record);
-                  return;
-                }
-                vm.onCopy(record);
-              },
+              onPressed:()  => shortcutAction(record),
               icon: record.canOpen
                   ? const Icon(Icons.open_in_new)
                   : const Icon(Icons.copy),

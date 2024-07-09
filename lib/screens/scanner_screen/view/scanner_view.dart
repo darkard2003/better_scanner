@@ -166,7 +166,7 @@ class HistoryView extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.search),
-              onPressed: () {},
+              onPressed: vm.onSearch,
             ),
           ],
           backgroundColor: Colors.transparent,
@@ -174,6 +174,11 @@ class HistoryView extends StatelessWidget {
         ),
         RecordListViewSliver(
           records: vm.records,
+          onTap: vm.onTap,
+          onEdit: vm.onEdit,
+          onDelete: vm.onDelete,
+          onShare: vm.onShare,
+          shortcutAction: vm.shortcutAction,
         ),
       ]),
     );
