@@ -76,7 +76,7 @@ class RecordCard extends StatelessWidget {
         ),
         child: ListTile(
             leading: Icon(record.type.icon),
-            onTap: () => vm.onTap,
+            onTap: () => vm.onTap(record),
             title: Text(
               record.name.isEmpty ? record.displayName : record.name,
               maxLines: 1,

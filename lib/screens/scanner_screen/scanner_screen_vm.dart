@@ -1,15 +1,23 @@
 import 'dart:async';
 
+import 'package:better_scanner/helpers/show_details_dialog.dart';
+import 'package:better_scanner/helpers/show_generator_dialog.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:better_scanner/shared/base_vm.dart';
+import 'package:better_scanner/shared/screen_breakpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
+  bool cameraEnabled = false;
+  TorchState flashEnabled = TorchState.unavailable;
+  CameraFacing cameraFacing = CameraFacing.back;
+  ScreenSize screenSize = ScreenSize.small;
+
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
       autoStart: false,
@@ -17,12 +25,19 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
       detectionSpeed: DetectionSpeed.noDuplicates,
     );
     WidgetsBinding.instance.addObserver(this);
+    controller.addListener(() {
+      var state = controller.value;
+      cameraEnabled = state.isRunning;
+      flashEnabled = state.torchState;
+      cameraFacing = state.cameraDirection;
+      safeNotifyListeners();
+    });
     _subscription = controller.barcodes.listen(_handleBarcode);
     unawaited(controller.start());
     init();
   }
+
   bool isLoading = true;
-  bool cameraEnabled = false;
   late Database db;
   late MobileScannerController controller;
   StreamSubscription<Object?>? _subscription;
@@ -76,20 +91,15 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
     safeNotifyListeners();
   }
 
+  void changeScreenSize(double width) {
+    screenSize = screenSizeFromSize(width);
+    safeNotifyListeners();
+  }
+
   void onDelete(QrRecordModel record) async {
     await db.deleteRecord(record);
     records.removeWhere((element) => element.id == record.id);
     safeShowSnackBar('Deleted ${record.name}');
-    safeNotifyListeners();
-  }
-
-  void onEdit(QrRecordModel record) async {
-    final newRecord = await Navigator.pushNamed(context, '/generator',
-        arguments: {'qr': record}) as QrRecordModel?;
-
-    if (newRecord == null) return;
-    await db.updateRecord(newRecord);
-    records = await db.getRecords();
     safeNotifyListeners();
   }
 
@@ -108,12 +118,45 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
     safeNotifyListeners();
   }
 
+  void onGenerate() async {
+    unawaited(controller.stop());
+    var record = await showGeneratorDialog(
+      context,
+      fullScreen: screenSize == ScreenSize.small,
+    );
+    unawaited(controller.start());
+    if (record == null) return;
+    onScan(record);
+  }
+
+  void onUpload() async {
+    var scanned = await QrServices.scanQrFromFile(controller);
+    if (!scanned) safeShowSnackBar("Failed to Scan QR");
+  }
+
   void onTap(QrRecordModel record) async {
     unawaited(controller.stop());
-    var _ = await Navigator.pushNamed(context, '/generator',
-        arguments: {'qr': record}) as QrRecordModel?;
+    var _ = await showDetailsDialog(
+      context,
+      record: record,
+      fullScreen: screenSize == ScreenSize.small,
+    );
     safeNotifyListeners();
     unawaited(controller.start());
+  }
+
+  void onEdit(QrRecordModel record) async {
+    unawaited(controller.stop());
+    var newRecord = await showGeneratorDialog(
+      context,
+      fullScreen: screenSize == ScreenSize.small,
+      record: record,
+    );
+    unawaited(controller.start());
+    if (newRecord == null) return;
+    await db.updateRecord(newRecord);
+    records = await db.getRecords();
+    safeNotifyListeners();
   }
 
   void openUrl(QrRecordModel record) async {

@@ -5,6 +5,7 @@ class CopyTextBox extends StatelessWidget {
   final TextStyle? style;
   final Function()? onCopy;
   final double minHeight;
+
   const CopyTextBox({
     super.key,
     required this.text,
@@ -33,8 +34,8 @@ class CopyTextBox extends StatelessWidget {
           ),
         ),
         Positioned(
-        top: 0,
-        right: 10,
+          top: 0,
+          right: 10,
           child: IconButton(
             icon: const Icon(
               Icons.copy,

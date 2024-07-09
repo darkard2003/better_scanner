@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class CustomIconButton extends StatelessWidget {
   final Widget icon;
   final VoidCallback onPressed;
+  final Color? color;
 
   const CustomIconButton({
     super.key,
     required this.icon,
     required this.onPressed,
+    this.color,
   });
 
   @override
@@ -15,7 +17,7 @@ class CustomIconButton extends StatelessWidget {
     var colorScheme = Theme.of(context).colorScheme;
     return IconButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(colorScheme.primary),
+        backgroundColor: WidgetStateProperty.all(color ?? colorScheme.primary),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),

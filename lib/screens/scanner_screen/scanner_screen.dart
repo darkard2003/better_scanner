@@ -8,9 +8,15 @@ class ScannerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ScannerScreenVM(context),
-      child: const ScannerView(),
+    return Scaffold(
+      appBar: AppBar(
+        leading: Image.asset('assets/images/icon.png'),
+        title: const Text('Better Scanner'),
+      ),
+      body: ChangeNotifierProvider(
+        create: (context) => ScannerScreenVM(context),
+        child: const ScannerView(),
+      ),
     );
   }
 }

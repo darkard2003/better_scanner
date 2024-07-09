@@ -1,9 +1,6 @@
-import 'dart:async';
-
-import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/scanner_screen_vm.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
-import 'package:better_scanner/services/qr_services/qr_services.dart';
+import 'package:better_scanner/shared/screen_breakpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -16,84 +13,78 @@ class ScannerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<ScannerScreenVM>();
+    var size = MediaQuery.of(context).size;
+    vm.changeScreenSize(size.width);
+    var constraints = BoxConstraints(
+      maxWidth: size.width,
+      maxHeight: size.height,
+    );
+
     List<Widget> buildActions() {
       return [
-        ValueListenableBuilder(
-            valueListenable: vm.controller,
-            builder: (context, state, widget) {
-              bool cameraEnabled = state.isRunning;
-              return IconButton(
-                icon: Icon(
-                  cameraEnabled ? Icons.camera_alt : Icons.camera_alt_outlined,
-                ),
-                onPressed: () {
-                  cameraEnabled ? vm.controller.stop() : vm.controller.start();
-                },
-              );
-            }),
-        ValueListenableBuilder(
-          valueListenable: vm.controller,
-          builder: (context, state, widget) {
-            bool torchEnabled = state.torchState == TorchState.on;
-            return IconButton(
-              icon: Icon(
-                torchEnabled ? Icons.flash_on : Icons.flash_off,
-              ),
-              onPressed: state.torchState != TorchState.unavailable
-                  ? () {
-                      torchEnabled
-                          ? vm.controller.toggleTorch()
-                          : vm.controller.toggleTorch();
-                    }
-                  : null,
-            );
+        IconButton(
+          icon: Icon(
+            vm.cameraEnabled ? Icons.camera_alt : Icons.camera_alt_outlined,
+          ),
+          onPressed: () {
+            vm.cameraEnabled ? vm.controller.stop() : vm.controller.start();
           },
         ),
-        ValueListenableBuilder(
-            valueListenable: vm.controller,
-            builder: (context, state, widget) {
-              bool cameraFacingBack =
-                  state.cameraDirection == CameraFacing.back;
-              return IconButton(
-                icon: Icon(
-                  cameraFacingBack ? Icons.camera_front : Icons.camera_rear,
-                ),
-                onPressed: () {
-                  vm.controller.switchCamera();
-                },
-              );
-            }),
+        IconButton(
+          icon: Icon(
+            vm.flashEnabled == TorchState.on ? Icons.flash_on : Icons.flash_off,
+          ),
+          onPressed: vm.flashEnabled != TorchState.unavailable
+              ? () {
+                  vm.controller.toggleTorch();
+                }
+              : null,
+        ),
+        IconButton(
+          icon: Icon(
+            vm.cameraFacing == CameraFacing.back
+                ? Icons.camera_front
+                : Icons.camera_rear,
+          ),
+          onPressed: () {
+            vm.controller.switchCamera();
+          },
+        ),
       ];
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: Image.asset('assets/images/icon.png'),
-        title: const Text('Better Scanner'),
-        centerTitle: true,
-      ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < 700) {
-          return Column(
-            children: [
-              ScanView(
-                dimentions: constraints.maxHeight * 0.5 - 50,
-                controller: vm.controller,
-              ),
-              SizedBox(
-                height: 50,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: buildActions(),
+    switch (vm.screenSize) {
+      case ScreenSize.small:
+      case ScreenSize.medium:
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 700,
+            ),
+            child: Column(
+              children: [
+                ScanView(
+                  dimentions: constraints.maxHeight * 0.5 - 50,
+                  controller: vm.controller,
                 ),
-              ),
-              SizedBox(
-                height: constraints.maxHeight * 0.5,
-                child: const HistoryView(),
-              ),
-            ],
-          );
-        }
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: buildActions(),
+                  ),
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: constraints.maxHeight * 0.5,
+                    child: const HistoryView(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      default:
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -116,8 +107,7 @@ class ScannerView extends StatelessWidget {
             ),
           ],
         );
-      }),
-    );
+    }
   }
 }
 
@@ -125,6 +115,7 @@ class ScanView extends StatelessWidget {
   final MobileScannerController controller;
 
   final double dimentions;
+
   const ScanView({
     super.key,
     required this.controller,
@@ -147,7 +138,7 @@ class HistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<ScannerScreenVM>();
+    final vm = context.watch<ScannerScreenVM>();
     return Container(
       constraints: const BoxConstraints(maxWidth: 600),
       decoration: BoxDecoration(
@@ -168,23 +159,12 @@ class HistoryView extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.qr_code),
-              onPressed: () async {
-                unawaited(vm.controller.stop());
-                var record = await Navigator.of(context).pushNamed('/generator')
-                    as QrRecordModel?;
-                unawaited(vm.controller.start());
-                if (record == null) return;
-                if (!context.mounted) return;
-                vm.onScan(record);
-              },
+              onPressed: vm.onGenerate,
             ),
             IconButton(
-                icon: const Icon(Icons.add_a_photo),
-                onPressed: () async {
-                  var scanned = await QrServices.scanQrFromFile(vm.controller);
-                  if (!context.mounted) return;
-                  if (!scanned) vm.safeShowSnackBar("Faild to Scan QR");
-                }),
+              icon: const Icon(Icons.add_a_photo),
+              onPressed: vm.onUpload,
+            ),
             IconButton(
               icon: const Icon(Icons.search),
               onPressed: () {},

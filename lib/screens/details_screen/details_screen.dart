@@ -14,69 +14,82 @@ import 'package:flutter/material.dart';
 import '../../models/qr_record_model.dart';
 
 class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+  final QrRecordModel? qr;
+
+  const DetailsScreen({
+    super.key,
+    this.qr,
+  });
 
   @override
   Widget build(BuildContext context) {
     var args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    var qr = args['qr'] as QrRecordModel;
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    var qr = this.qr ?? args?['qr'] as QrRecordModel;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(qr.displayName),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: SharableQrPreview(
-                qr: qr,
-                onShare: (bytes) async {
-                  await QrServices.shareImage(bytes, qr.displayName);
-                }),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+    var size = MediaQuery.of(context).size;
+    var isSmallScreen = size.width < 700;
+
+    var qrView = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 300,
+          height: 300,
+          child: SharableQrPreview(
+              qr: qr,
+              onShare: (bytes) async {
+                await QrServices.shareImage(bytes, qr.displayName);
+              }),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomIconButton(
+              icon: const Icon(
+                Icons.copy,
+              ),
+              onPressed: () async {
+                await QrServices.copyTextToClipboard(qr.copyData);
+                if (!context.mounted) return;
+                showSnackbar(context, "Qr Copied to clipboard");
+              },
+            ),
+            const SizedBox(width: 16),
+            if (qr.canOpen) ...[
               CustomIconButton(
                 icon: const Icon(
-                  Icons.copy,
+                  Icons.launch,
                 ),
                 onPressed: () async {
-                  await QrServices.copyTextToClipboard(qr.copyData);
-                  if (!context.mounted) return;
-                  showSnackbar(context, "Qr Copied to clipboard");
+                  await QrServices.launch(qr);
                 },
               ),
               const SizedBox(width: 16),
-              if (qr.canOpen) ...[
-                CustomIconButton(
-                  icon: const Icon(
-                    Icons.launch,
-                  ),
-                  onPressed: () async {
-                    await QrServices.launch(qr);
-                  },
-                ),
-                const SizedBox(width: 16),
-              ],
-              CustomIconButton(
-                icon: const Icon(
-                  Icons.share,
-                ),
-                onPressed: () async {
-                  await QrServices.shareQrText(qr);
-                },
-              ),
             ],
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          if (qr.runtimeType == WifiCredQr)
-            Padding(
+            CustomIconButton(
+              icon: const Icon(
+                Icons.share,
+              ),
+              onPressed: () async {
+                await QrServices.shareQrText(qr);
+              },
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
+    );
+
+    var detailsField = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Builder(builder: (context) {
+          if (qr.runtimeType == WifiCredQr) {
+            return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: WifiDetailsField(
                 wifi: qr as WifiCredQr,
@@ -91,9 +104,9 @@ class DetailsScreen extends StatelessWidget {
                   showSnackbar(context, "Password copied to clipbard");
                 },
               ),
-            )
-          else if (qr.runtimeType == GeoLocationQr)
-            Padding(
+            );
+          } else if (qr.runtimeType == GeoLocationQr) {
+            return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: GeoDetailsField(
                 geo: qr as GeoLocationQr,
@@ -114,9 +127,9 @@ class DetailsScreen extends StatelessWidget {
                       context, "Latitude and Longitude copied to clipbard");
                 },
               ),
-            )
-          else if (qr.runtimeType == PhoneQr)
-            Padding(
+            );
+          } else if (qr.runtimeType == PhoneQr) {
+            return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: PhoneDetailsField(
                 phone: qr as PhoneQr,
@@ -126,9 +139,9 @@ class DetailsScreen extends StatelessWidget {
                   showSnackbar(context, "Phone copied to clipbard");
                 },
               ),
-            )
-          else if (qr.runtimeType == SMSQr)
-            Padding(
+            );
+          } else if (qr.runtimeType == SMSQr) {
+            return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: SmsDetailsField(
                 sms: qr as SMSQr,
@@ -143,9 +156,9 @@ class DetailsScreen extends StatelessWidget {
                   showSnackbar(context, "Phone copied to clipbard");
                 },
               ),
-            )
-          else if (qr.runtimeType == EmailQr)
-            Padding(
+            );
+          } else if (qr.runtimeType == EmailQr) {
+            return Padding(
               padding: const EdgeInsets.only(bottom: 20),
               child: EmailDetailsField(
                 email: qr as EmailQr,
@@ -165,16 +178,79 @@ class DetailsScreen extends StatelessWidget {
                   showSnackbar(context, "Body copied to clipbard");
                 },
               ),
+            );
+          } else {
+            return const SizedBox();
+          }
+        }),
+        CopyTextBox(
+          text: qr.data,
+          onCopy: () async {
+            await QrServices.copyTextToClipboard(qr.data);
+            if (!context.mounted) return;
+            showSnackbar(context, "Qr Copied to clipboard");
+          },
+        )
+      ],
+    );
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth: 700,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(width: 10),
+                Text(
+                  qr.displayName,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close),
+                ),
+                const SizedBox(width: 10),
+              ],
             ),
-          CopyTextBox(
-            text: qr.data,
-            onCopy: () async {
-              await QrServices.copyTextToClipboard(qr.data);
-              if (!context.mounted) return;
-              showSnackbar(context, "Qr Copied to clipboard");
-            },
-          ),
-        ],
+            const SizedBox(height: 16),
+            isSmallScreen
+                ? Expanded(
+                  child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          qrView,
+                          const SizedBox(height: 16),
+                          detailsField,
+                          const SizedBox(
+                            height: 50,
+                          ),
+                        ],
+                      ),
+                    ),
+                )
+                : Row(
+                    children: [
+                      qrView,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: detailsField,
+                        ),
+                      ),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }

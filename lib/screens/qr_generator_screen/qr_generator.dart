@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class QrGeneratorScreen extends StatelessWidget {
-  const QrGeneratorScreen({super.key});
+  final QrRecordModel? qr;
+
+  const QrGeneratorScreen({super.key, this.qr});
 
   @override
   Widget build(BuildContext context) {
     var args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    var qr = args?['qr'] as QrRecordModel?;
+    var qr = this.qr ?? args?['qr'] as QrRecordModel?;
     return BlocProvider<QrGeneratorVM>(
       create: (context) => QrGeneratorVM(context: context, qrIn: qr),
       child: const QrGeneratorView(),

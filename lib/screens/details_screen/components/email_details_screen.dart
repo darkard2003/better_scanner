@@ -39,4 +39,3 @@ class EmailDetailsField extends StatelessWidget {
     ]);
   }
 }
-
