@@ -10,8 +10,8 @@ import 'package:better_scanner/screens/shared/show_confirmation_dialog.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
+import 'package:provider/provider.dart';
 
 class QrGeneratorView extends StatelessWidget {
   const QrGeneratorView({super.key});

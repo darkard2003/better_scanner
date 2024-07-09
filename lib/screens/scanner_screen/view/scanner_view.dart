@@ -2,8 +2,8 @@ import 'package:better_scanner/screens/scanner_screen/scanner_screen_vm.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_list_view.dart';
 import 'package:better_scanner/shared/screen_breakpoints.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
 
 import 'components/scan_window.dart';
 
