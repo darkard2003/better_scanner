@@ -150,7 +150,7 @@ class QrGeneratorView extends StatelessWidget {
         maxWidth: 700,
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

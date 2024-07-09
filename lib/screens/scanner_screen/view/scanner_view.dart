@@ -55,7 +55,6 @@ class ScannerView extends StatelessWidget {
 
     switch (vm.screenSize) {
       case ScreenSize.small:
-      case ScreenSize.medium:
         return Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(

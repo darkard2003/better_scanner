@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 class WifiQrGenerator extends StatefulWidget {
   final Function(String) onQrGenerated;
   final String wifiQr;
+
   const WifiQrGenerator({
     super.key,
     required this.onQrGenerated,
@@ -66,10 +67,12 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Row(
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: WifiSecurity.values
                     .map((s) => Padding(
                           padding: const EdgeInsets.only(right: 8),
@@ -86,16 +89,16 @@ class _WifiQrGeneratorState extends State<WifiQrGenerator> {
                         ))
                     .toList(),
               ),
-            ),
-            const Text('Hidden'),
-            Checkbox(
-              value: hidden,
-              onChanged: (value) {
-                hidden = value!;
-                onChanged();
-              },
-            ),
-          ],
+              const Text('Hidden'),
+              Checkbox(
+                value: hidden,
+                onChanged: (value) {
+                  hidden = value!;
+                  onChanged();
+                },
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 8.0),
         DecoratedTextField(
