@@ -4,6 +4,7 @@ import 'package:better_scanner/helpers/show_details_dialog.dart';
 import 'package:better_scanner/helpers/show_generator_dialog.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/screens/scanner_screen/view/components/record_action.dart';
+import 'package:better_scanner/screens/shared/show_snackbar.dart';
 import 'package:better_scanner/services/database/database.dart';
 import 'package:better_scanner/services/database/db_provider.dart';
 import 'package:better_scanner/services/qr_services/qr_services.dart';
@@ -11,6 +12,7 @@ import 'package:better_scanner/shared/base_vm.dart';
 import 'package:better_scanner/shared/screen_breakpoints.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../helpers/show_search_dialog.dart';
@@ -20,6 +22,7 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   TorchState flashEnabled = TorchState.unavailable;
   CameraFacing cameraFacing = CameraFacing.back;
   ScreenSize screenSize = ScreenSize.small;
+  final imagePicker = ImagePicker();
 
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
@@ -131,8 +134,16 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   }
 
   void onUpload() async {
-    var scanned = await QrServices.scanQrFromFile(controller);
-    if (!scanned) safeShowSnackBar("Failed to Scan QR");
+    final img = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (img == null) return;
+    final capture = await controller.analyzeImage(img.path);
+    if (capture == null) {
+      if (!context.mounted) return;
+      showSnackbar(context, "No barcodes found", type: SnackbarType.error);
+      return;
+    }
+    _handleBarcode(capture);
+    safeNotifyListeners();
   }
 
   Future<void> onTap(QrRecordModel record) async {

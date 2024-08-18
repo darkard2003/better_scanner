@@ -161,7 +161,7 @@ class HistoryView extends StatelessWidget {
               onPressed: vm.onGenerate,
             ),
             IconButton(
-              icon: const Icon(Icons.add_a_photo),
+              icon: const Icon(Icons.add_photo_alternate_outlined),
               onPressed: vm.onUpload,
             ),
             IconButton(

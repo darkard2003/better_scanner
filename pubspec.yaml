@@ -45,6 +45,7 @@ dependencies:
   pretty_qr_code: ^3.3.0
   file_picker: ^8.0.0+1
   provider: ^6.1.2
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

@@ -5,8 +5,8 @@ import 'package:better_scanner/models/qr_models.dart';
 import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/models/qr_type_extention.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -76,23 +76,6 @@ class QrServices {
       qrList.add(record);
     }
     return qrList;
-  }
-
-  static Future<bool> scanQrFromFile(MobileScannerController controller) async {
-    var file = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
-    if (file == null) {
-      return false;
-    }
-    var path = file.files.single.path;
-
-    if (path == null) {
-      return false;
-    }
-
-    await controller.analyzeImage(path);
-    return true;
   }
 
   static Future<String?> checkRedirection(String url) async {
