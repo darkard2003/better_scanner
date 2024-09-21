@@ -23,6 +23,8 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   CameraFacing cameraFacing = CameraFacing.back;
   ScreenSize screenSize = ScreenSize.small;
   final imagePicker = ImagePicker();
+  double zoom = 1.0;
+  double _baseScale = 1.0;
 
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
@@ -223,5 +225,26 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
       case RecordAction.shortcut:
         shortcutAction(intent.record);
     }
+  }
+
+  void initScale() {
+    _baseScale = zoom;
+  }
+
+  bool _updateScaleMutex = false;
+
+  Future<void> updateScale(double scale) async {
+    if (_updateScaleMutex) return;
+    _updateScaleMutex = true;
+    var newScale = (_baseScale * scale).clamp(1.0, 4.0);
+    var newZoom = _baseScale * newScale;
+    if (newZoom == zoom) {
+      _updateScaleMutex = false;
+      return;
+    }
+    zoom = newZoom;
+    await controller.setZoomScale(zoom);
+    safeNotifyListeners();
+    _updateScaleMutex = false;
   }
 }

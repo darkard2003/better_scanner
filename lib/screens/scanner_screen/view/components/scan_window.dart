@@ -1,47 +1,44 @@
+import 'package:better_scanner/screens/scanner_screen/scanner_screen_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:provider/provider.dart';
 
 class ScanWindow extends StatelessWidget {
   final double size;
-  final MobileScannerController controller;
+
   const ScanWindow({
     super.key,
-    required this.controller,
     this.size = 300,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: size,
-      child: Card(
-        elevation: 10,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Stack(
-            children: [
-              MobileScanner(
-                controller: controller,
-                onDetect: (record) {},
-              ),
-            ],
+    final vm = context.watch<ScannerScreenVM>();
+    final controller = vm.controller;
+    return GestureDetector(
+      onScaleStart: (details) {
+        vm.initScale();
+      },
+      onScaleUpdate: (details) async {
+        await vm.updateScale(details.scale);
+      },
+      child: SizedBox.square(
+        dimension: size,
+        child: Card(
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Stack(
+              children: [
+                MobileScanner(
+                  controller: controller,
+                  onDetect: (record) {},
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-// Iterable<Widget> buildActions(
-//     BuildContext context, MobileScannerController controller) sync* {
-//   yield IconButton(
-//     icon: Icon(controller.facing == CameraFacing.back
-//         ? Icons.camera_front
-//         : Icons.camera_rear),
-//     onPressed: () => controller.switchCamera(),
-//   );
-//   yield IconButton(
-//     icon: Icon(controller== TorchState.off ? Icons.flash_off : Icons.flash_on),
-//     onPressed: () => controller.hasTorch ? controller.toggleTorch() : null,
-//   );
-// }

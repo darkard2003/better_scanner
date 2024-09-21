@@ -124,7 +124,6 @@ class ScanView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScanWindow(
-      controller: controller,
       size: dimentions,
     );
   }
