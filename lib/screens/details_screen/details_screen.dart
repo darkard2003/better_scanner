@@ -168,8 +168,7 @@ class DetailsScreen extends StatelessWidget {
             return const SizedBox();
           }
         }),
-        if(qr.runtimeType != QrRecordModel)
-          const SizedBox(height: 16),
+        if (qr.runtimeType != QrRecordModel) const SizedBox(height: 16),
         CopyTextBox(
           text: qr.data,
           onCopy: () async {
@@ -211,7 +210,7 @@ class DetailsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             isSmallScreen
                 ? Expanded(
-                  child: SingleChildScrollView(
+                    child: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -223,7 +222,7 @@ class DetailsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                )
+                  )
                 : Row(
                     children: [
                       qrView,

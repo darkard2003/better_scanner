@@ -6,7 +6,6 @@ import 'package:better_scanner/models/qr_record_model.dart';
 import 'package:better_scanner/models/qr_type.dart';
 import 'package:better_scanner/models/qr_type_extention.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
