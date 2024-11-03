@@ -22,6 +22,12 @@ class ScanWindow extends StatelessWidget {
       onScaleUpdate: (details) async {
         await vm.updateScale(details.scale);
       },
+      onScaleEnd: (details) {
+        vm.onScaleEnd();
+      },
+      onDoubleTap: () {
+        vm.onDoubleTap();
+      },
       child: SizedBox.square(
         dimension: size,
         child: Card(

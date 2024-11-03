@@ -23,8 +23,14 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   CameraFacing cameraFacing = CameraFacing.back;
   ScreenSize screenSize = ScreenSize.small;
   final imagePicker = ImagePicker();
-  double zoom = 1.0;
-  double _baseScale = 1.0;
+  double previousScale = 1.0;
+  double scale = 1.0;
+  double zoom = 1.0; // Add zoom variable to retain zoom level
+  final Duration debounceDuration = const Duration(milliseconds: 50);
+  Timer? _debounce;
+
+  final max_zoom = 4.0;
+  final min_zoom = 1.0;
 
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
@@ -40,6 +46,7 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
       cameraFacing = state.cameraDirection;
       safeNotifyListeners();
     });
+    controller.barcodes.listen(_handleBarcode);
     unawaited(controller.start());
     init();
   }
@@ -228,23 +235,36 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   }
 
   void initScale() {
-    _baseScale = zoom;
+    previousScale = scale;
   }
 
-  bool _updateScaleMutex = false;
-
   Future<void> updateScale(double scale) async {
-    if (_updateScaleMutex) return;
-    _updateScaleMutex = true;
-    var newScale = (_baseScale * scale).clamp(1.0, 4.0);
-    var newZoom = _baseScale * newScale;
-    if (newZoom == zoom) {
-      _updateScaleMutex = false;
-      return;
+    if (_debounce?.isActive ?? false) return;
+    _debounce = Timer(debounceDuration, () async {
+      this.scale = (previousScale * scale).clamp(min_zoom, max_zoom);
+      zoom = this.scale;
+
+      double normalizedZoom = (zoom - min_zoom) / (max_zoom - min_zoom);
+
+      await controller.setZoomScale(normalizedZoom);
+      debugPrint('Zoom: $zoom');
+      debugPrint('Normalized Zoom: $normalizedZoom');
+      safeNotifyListeners();
+    });
+  }
+
+  void onScaleEnd() {
+    previousScale = 1.0;
+  }
+
+  Future<void> onDoubleTap() async {
+    if (zoom == 1.0) {
+      zoom = 2.0;
+    } else {
+      zoom = 1.0;
     }
-    zoom = newZoom;
-    await controller.setZoomScale(zoom);
+    double normalizedZoom = (zoom - min_zoom) / (max_zoom - min_zoom);
+    await controller.setZoomScale(normalizedZoom);
     safeNotifyListeners();
-    _updateScaleMutex = false;
   }
 }
