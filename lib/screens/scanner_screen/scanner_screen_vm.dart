@@ -116,19 +116,28 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
     safeNotifyListeners();
   }
 
-  void onScan(QrRecordModel record) async {
-    if (records.any((element) => element.data == record.data)) {
-      var exrecord =
-          records.firstWhere((element) => element.data == record.data);
-      records.remove(exrecord);
-      await db.deleteRecord(exrecord);
-      records.insert(0, record);
+  Future<void> onScan(QrRecordModel record) async {
+    try {
+      final existingIndex =
+          records.indexWhere((element) => element.data == record.data);
+
+      if (existingIndex != -1) {
+        if (existingIndex == 0) return;
+        final existingRecord = records[existingIndex];
+        await db.deleteRecord(existingRecord);
+        records.removeAt(existingIndex);
+      }
+
       await db.addRecord(record);
-    } else {
       records.insert(0, record);
-      await db.addRecord(record);
+
+      safeShowSnackBar('Scanned: ${record.name}');
+    } catch (e) {
+      safeShowSnackBar('Failed to save scan', isError: true);
+      debugPrint('Scan error: $e');
+    } finally {
+      safeNotifyListeners();
     }
-    safeNotifyListeners();
   }
 
   void onGenerate() async {
