@@ -9,11 +9,17 @@ Future<RecordSearchIntent?> showSearchDialog(BuildContext context,
     builder: (context) {
       return fullScreen
           ? Dialog.fullscreen(
+              insetAnimationDuration: Duration(milliseconds: 250),
+              insetAnimationCurve: Curves.bounceInOut,
               child: SearchScreenView(
                 records: records,
               ),
             )
           : Dialog(
+              insetAnimationDuration: Duration(milliseconds: 250),
+              insetAnimationCurve: Curves.bounceInOut,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               child: SearchScreenView(
                 records: records,
               ),

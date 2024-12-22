@@ -13,11 +13,15 @@ Future<QrRecordModel?> showGeneratorDialog(
       builder: (context) {
         return fullScreen
             ? Dialog.fullscreen(
+                insetAnimationCurve: Curves.bounceInOut,
+                insetAnimationDuration: Duration(milliseconds: 250),
                 child: QrGeneratorScreen(
                   qr: record,
                 ),
               )
             : Dialog(
+                insetAnimationCurve: Curves.bounceInOut,
+                insetAnimationDuration: Duration(milliseconds: 250),
                 child: QrGeneratorScreen(
                   qr: record,
                 ),

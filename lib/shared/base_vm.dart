@@ -11,6 +11,11 @@ class BaseVM extends ChangeNotifier {
 
   void safeShowSnackBar(String message, {bool isError = false}) {
     if (!context.mounted) return;
-    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
   }
 }
