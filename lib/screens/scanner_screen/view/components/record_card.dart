@@ -119,8 +119,6 @@ extension on QrType {
         return Icons.calendar_today;
       case QrType.event:
         return Icons.event;
-      default:
-        return Icons.text_fields;
     }
   }
 }

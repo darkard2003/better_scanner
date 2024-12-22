@@ -20,8 +20,6 @@ abstract class DBProvider {
       case DBType.hive:
         _database = HiveDB();
         break;
-      default:
-        throw Exception('Database type not supported');
     }
     await _database!.init(uid);
     return _database!;

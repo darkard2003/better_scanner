@@ -29,8 +29,8 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   final Duration debounceDuration = const Duration(milliseconds: 50);
   Timer? _debounce;
 
-  final max_zoom = 4.0;
-  final min_zoom = 1.0;
+  final maxZoom = 4.0;
+  final minZoom = 1.0;
 
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
@@ -250,10 +250,10 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   Future<void> updateScale(double scale) async {
     if (_debounce?.isActive ?? false) return;
     _debounce = Timer(debounceDuration, () async {
-      this.scale = (previousScale * scale).clamp(min_zoom, max_zoom);
+      this.scale = (previousScale * scale).clamp(minZoom, maxZoom);
       zoom = this.scale;
 
-      double normalizedZoom = (zoom - min_zoom) / (max_zoom - min_zoom);
+      double normalizedZoom = (zoom - minZoom) / (maxZoom - minZoom);
 
       await controller.setZoomScale(normalizedZoom);
       debugPrint('Zoom: $zoom');
@@ -272,7 +272,7 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
     } else {
       zoom = 1.0;
     }
-    double normalizedZoom = (zoom - min_zoom) / (max_zoom - min_zoom);
+    double normalizedZoom = (zoom - minZoom) / (maxZoom - minZoom);
     await controller.setZoomScale(normalizedZoom);
     safeNotifyListeners();
   }
