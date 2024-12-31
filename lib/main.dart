@@ -14,13 +14,13 @@ class MyApp extends StatelessWidget {
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
       ColorScheme light, dark;
       if (lightDynamic != null) {
-        light = lightDynamic.harmonized();
+        light = lightDynamic.copyWith(secondary: Colors.cyan).harmonized();
       } else {
         light = ColorScheme.fromSeed(seedColor: Colors.cyan);
       }
 
       if (darkDynamic != null) {
-        dark = darkDynamic.harmonized();
+        dark = darkDynamic.copyWith(secondary: Colors.cyan).harmonized();
       } else {
         dark = ColorScheme.fromSeed(
             seedColor: Colors.cyan, brightness: Brightness.dark);
