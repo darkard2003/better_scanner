@@ -1,0 +1,2 @@
+/home/dark/code/flutter/better_scanner/android/app/.cxx/Debug/5125a393/x86/CMakeFiles/edit_cache.dir
+/home/dark/code/flutter/better_scanner/android/app/.cxx/Debug/5125a393/x86/CMakeFiles/rebuild_cache.dir

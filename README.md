@@ -1,4 +1,4 @@
-# Better Scanner
+f# Better Scanner
 
 A powerful QR code scanner application built with Flutter, offering advanced scanning capabilities and management features.
 

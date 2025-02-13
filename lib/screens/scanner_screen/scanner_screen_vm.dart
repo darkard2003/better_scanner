@@ -17,20 +17,25 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../helpers/show_search_dialog.dart';
 
+class CameraConfig {
+  static const double maxZoom = 4.0;
+  static const double minZoom = 1.0;
+  static const Duration debounceDuration = Duration(milliseconds: 50);
+  static const double defaultScale = 1.0;
+  static const double defaultZoom = 1.0;
+}
+
 class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
   bool cameraEnabled = false;
   TorchState flashEnabled = TorchState.unavailable;
   CameraFacing cameraFacing = CameraFacing.back;
   ScreenSize screenSize = ScreenSize.small;
   final imagePicker = ImagePicker();
-  double previousScale = 1.0;
-  double scale = 1.0;
-  double zoom = 1.0; // Add zoom variable to retain zoom level
-  final Duration debounceDuration = const Duration(milliseconds: 50);
-  Timer? _debounce;
-
-  final maxZoom = 4.0;
-  final minZoom = 1.0;
+  double previousScale = CameraConfig.defaultScale;
+  double scale = CameraConfig.defaultScale;
+  double zoom = CameraConfig.defaultZoom;
+  bool zooming = false;
+  Timer? _zoomDebounce;
 
   ScannerScreenVM(super.context) {
     controller = MobileScannerController(
@@ -83,8 +88,10 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _zoomDebounce?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     unawaited(_subscription?.cancel());
+    unawaited(controller.dispose());
     super.dispose();
   }
 
@@ -245,35 +252,49 @@ class ScannerScreenVM extends BaseVM with WidgetsBindingObserver {
 
   void initScale() {
     previousScale = scale;
+    zooming = true;
   }
 
   Future<void> updateScale(double scale) async {
-    if (_debounce?.isActive ?? false) return;
-    _debounce = Timer(debounceDuration, () async {
-      this.scale = (previousScale * scale).clamp(minZoom, maxZoom);
-      zoom = this.scale;
-
-      double normalizedZoom = (zoom - minZoom) / (maxZoom - minZoom);
-
-      await controller.setZoomScale(normalizedZoom);
-      debugPrint('Zoom: $zoom');
-      debugPrint('Normalized Zoom: $normalizedZoom');
+    try {
+      this.scale = (previousScale * scale).clamp(
+        CameraConfig.minZoom,
+        CameraConfig.maxZoom,
+      );
+      if (_zoomDebounce?.isActive ?? false) return;
+      _zoomDebounce = Timer(CameraConfig.debounceDuration, () async {
+        await controller.setZoomScale(_normalizeZoom(this.scale));
+      });
       safeNotifyListeners();
-    });
+    } catch (e) {
+      debugPrint('Error updating camera zoom: $e');
+      safeShowSnackBar('Failed to update camera zoom', isError: true);
+    }
   }
 
-  void onScaleEnd() {
-    previousScale = 1.0;
+  void onScaleEnd() async {
+    previousScale = CameraConfig.defaultScale;
+    await controller.setZoomScale(_normalizeZoom(scale));
   }
 
   Future<void> onDoubleTap() async {
-    if (zoom == 1.0) {
-      zoom = 2.0;
-    } else {
-      zoom = 1.0;
+    try {
+      zoom = (zoom == CameraConfig.minZoom) ? 2.0 : CameraConfig.minZoom;
+
+      double normalizedZoom = (zoom - CameraConfig.minZoom) /
+          (CameraConfig.maxZoom - CameraConfig.minZoom);
+
+      await controller.setZoomScale(normalizedZoom);
+      safeNotifyListeners();
+    } catch (e) {
+      debugPrint('Error handling double tap: $e');
+      safeShowSnackBar('Failed to update camera zoom', isError: true);
     }
-    double normalizedZoom = (zoom - minZoom) / (maxZoom - minZoom);
-    await controller.setZoomScale(normalizedZoom);
-    safeNotifyListeners();
+  }
+
+  // Helper method for zoom normalization
+  double _normalizeZoom(double currentZoom) {
+    return (currentZoom - CameraConfig.minZoom) /
+        (CameraConfig.maxZoom - CameraConfig.minZoom);
   }
 }

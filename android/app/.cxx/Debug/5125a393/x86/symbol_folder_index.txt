@@ -1,0 +1,1 @@
+/home/dark/code/flutter/better_scanner/build/app/intermediates/cxx/Debug/5125a393/obj/x86
