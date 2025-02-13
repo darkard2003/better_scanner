@@ -141,6 +141,10 @@ class HistoryView extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 600),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        border: Border(
+            top: BorderSide(
+          color: Colors.grey.withAlpha(100),
+        )),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
